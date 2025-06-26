@@ -1,0 +1,19 @@
+use_generated_labels: false    # or false
+# labels: []                    # ignored if use_generated_labels is true
+# label_source: "bertopic"      # or "top2vec", "tfidf", etc.
+
+labels:
+  - training
+  - trust
+  - community impact
+  - confidence
+  - knowledge sharing
+
+models:
+  - mistral
+  - llama3
+  - gpt
+  - gemini
+  - claude
+
+output_csv: "conceptual_analysis_output.csv"
