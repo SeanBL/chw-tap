@@ -1,47 +1,65 @@
 import os
-import re
-import ast
-from typing import List, Dict
+import json
 from dotenv import load_dotenv
-from models.base_model import BaseModel
-
 import google.generativeai as genai
+from models.base_model import BaseModel
+from typing import List, Dict
 
 load_dotenv()
 
 class GeminiModel(BaseModel):
-    def __init__(self, api_key: str = None, model_name: str = "models/gemini-1.5-pro-latest"):
-        self.api_key = api_key or os.getenv("GOOGLE_API_KEY")
+    def __init__(self, model_name="gemini-pro"):
         self.model_name = model_name
-
-        genai.configure(api_key=self.api_key)
+        api_key = os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            raise ValueError("Google API key not found in .env under GOOGLE_API_KEY.")
+        genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel(model_name=self.model_name)
 
-    def classify(self, text: str, labels: List[str]) -> Dict[str, any]:
-        prompt = (
-            f"Classify the following testimonial into any of these categories: {', '.join(labels)}.\n\n"
-            f"Testimonial:\n\"{text}\"\n\n"
-            f"Return a valid Python dictionary with categories as keys and confidence scores (0 to 1) as values. "
-            f"Only include categories that apply. Then provide a brief explanation of your choices."
-        )
+def classify(self, text: str, labels: List[str]) -> Dict:
+    prompt = f"""
+        Classify the following testimonial using the provided labels.
 
-        try:
-            response = self.model.generate_content(prompt)
-            content = response.text.strip()
+        Return only a JSON object in this format:
+        {{
+          "labels": {{
+            "label1": score (0 to 1),
+            ...
+          }},
+          "explanation": "brief explanation"
+        }}
 
-            match = re.search(r'(\{.*?\})', content, re.DOTALL)
-            if match:
-                dict_str = match.group(1)
-                explanation = content.replace(dict_str, "").strip()
-                output_dict = ast.literal_eval(dict_str)
-                return {
-                    "labels": {k: float(v) for k, v in output_dict.items()},
-                    "explanation": explanation
-                }
+        Testimonial:
+        \"{text}\"
 
-        except Exception as e:
-            print("⚠️ Gemini classification error:", str(e))
-            return {
-                "labels": {},
-                "explanation": "Parsing failed or API call failed"
-            }
+        Labels: {labels}
+    """
+
+    try:
+        response = self.model.generate_content(prompt)
+        raw_text = response.text.strip()
+
+        # Try parsing the JSON content from the response
+        json_str = self._extract_json(raw_text)
+        result = json.loads(json_str)
+
+        # Normalize scores and create binned labels
+        parsed_scores = {
+            label: float(result.get("labels", {}).get(label, 0.0))
+            for label in labels
+        }
+        binned_scores = {
+            label: 1 if parsed_scores[label] >= 0.5 else 0
+            for label in labels
+        }
+
+        explanation = result.get("explanation", "")
+        return {"labels": parsed_scores, "binned_labels": binned_scores, "explanation": explanation}
+
+    except Exception as e:
+        print(f"Gemini classification failed: {e}")
+        return {
+            "labels": {label: 0.0 for label in labels},
+            "binned_labels": {label: 0 for label in labels},
+            "explanation": "Parsing failed or API call failed"
+        }

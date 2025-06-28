@@ -10,10 +10,25 @@ labels:
   - knowledge sharing
 
 models:
-  - mistral
-  - llama3
-  - gpt
-  - gemini
+  # - mistral
+  # - llama3
+  # - qwen:7b
+  # - gpt
   - claude
+  # - gemini
+
+model_settings:
+  mistral:
+    temperature: 0.4
+  llama3:
+    temperature: 0.3
+  qwen:7b:
+    temperature: 0.5
+  gpt:
+    temperature: 0.2
+  claude:
+    temperature: 0.3
+  gemini:
+    temperature: 0.25
 
 output_csv: "conceptual_analysis_output.csv"

@@ -1,51 +1,72 @@
 import anthropic
 import os
-from models.base_model import BaseModel
+import json
 from typing import List, Dict
-import re, ast
+from models.base_model import BaseModel
 from dotenv import load_dotenv
 
 load_dotenv()
 
 class ClaudeModel(BaseModel):
-    def __init__(self, api_key: str = None, model: str = "claude-3-sonnet-20240229"):
+    def __init__(self, api_key: str = None, temperature: float = 0.7, model: str = "claude-opus-4-20250514"):
         self.api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
+        self.model_name = model
+        self.temperature = temperature
         self.client = anthropic.Anthropic(api_key=self.api_key)
-        self.model = model
 
-    def classify(self, text: str, labels: List[str]) -> Dict[str, any]:
+    def classify(self, text: str, labels: List[str]) -> Dict:
         prompt = (
-            f"Classify the following testimonial into any of these categories: {', '.join(labels)}.\n\n"
-            f"Testimonial:\n\"{text}\"\n\n"
-            f"Return a valid Python dictionary with categories as keys and confidence scores (0 to 1) as values. "
-            f"Only include categories that apply. Then provide a brief explanation of your choices."
+            f"Analyze the following testimonial:\n\"{text}\"\n\n"
+            f"Given the categories: {labels}, return a JSON object exactly like this:\n"
+            f'{{\n  "labels": {{"label1": 0.8, "label2": 0.4}},\n  "explanation": "Reason here."\n}}\n\n'
+            f"Only output JSON. Do not include any extra explanation or text."
         )
 
         try:
             response = self.client.messages.create(
-                model=self.model,
+                model=self.model_name,
+                temperature=self.temperature,
                 max_tokens=1024,
-                temperature=0.2,
                 messages=[
-                    {"role": "user", "content": prompt}
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
                 ]
             )
-
-            content = response.content[0].text.strip()
-
-            match = re.search(r'(\{.*?\})', content, re.DOTALL)
-            if match:
-                dict_str = match.group(1)
-                explanation = content.replace(dict_str, "").strip()
-                output_dict = ast.literal_eval(dict_str)
-                return {
-                    "labels": {k: float(v) for k, v in output_dict.items()},
-                    "explanation": explanation
-                }
-
+            reply = response.content[0].text
+            print("\n[DEBUG] Claude raw output:\n", reply)
+            return self.parse_output(reply, labels)
         except Exception as e:
-            print("⚠️ Claude classification error:", str(e))
+            print("[ERROR] Failed to parse Claude output:\n", text)
             return {
-                "labels": {},
-                "explanation": "Parsing failed or API call failed"
+                "labels": {label: 0.0 for label in labels},
+                "binned_labels": {label: 0 for label in labels},
+                "explanation": f"API call failed: {str(e)}"
             }
+
+    def parse_output(self, text: str, labels: List[str]) -> Dict:
+        def bin_score(score: float) -> int:
+            if score >= 0.66:
+                return 2
+            elif score >= 0.33:
+                return 1
+            else:
+                return 0
+
+        try:
+            data = json.loads(text)
+            parsed_scores = {
+                label: float(data.get("labels", {}).get(label, 0.0))
+                for label in labels
+            }
+            binned = {label: bin_score(score) for label, score in parsed_scores.items()}
+            explanation = data.get("explanation", "")
+            return {"labels": parsed_scores, "binned_labels": binned, "explanation": explanation}
+        except Exception as e:
+            return {
+                "labels": {label: 0.0 for label in labels},
+                "binned_labels": {label: 0 for label in labels},
+                "explanation": f"Failed to parse JSON: {str(e)}"
+            }
+
