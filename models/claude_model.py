@@ -4,6 +4,7 @@ import json
 from typing import List, Dict
 from models.base_model import BaseModel
 from dotenv import load_dotenv
+from utils.prompt_template import generate_prompt
 
 load_dotenv()
 
@@ -15,12 +16,7 @@ class ClaudeModel(BaseModel):
         self.client = anthropic.Anthropic(api_key=self.api_key)
 
     def classify(self, text: str, labels: List[str]) -> Dict:
-        prompt = (
-            f"Analyze the following testimonial:\n\"{text}\"\n\n"
-            f"Given the categories: {labels}, return a JSON object exactly like this:\n"
-            f'{{\n  "labels": {{"label1": 0.8, "label2": 0.4}},\n  "explanation": "Reason here."\n}}\n\n'
-            f"Only output JSON. Do not include any extra explanation or text."
-        )
+        prompt = generate_prompt(text, labels)
 
         try:
             response = self.client.messages.create(

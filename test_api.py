@@ -1,28 +1,10 @@
-import os
-from dotenv import load_dotenv
-from openai import OpenAI
+import krippendorff
 
-# Load .env first
-load_dotenv()
+# Each column is a rater, each row a unit (e.g., a testimonial)
+data = [[1, 1, 1],
+        [0, 0, 1],
+        [1, 1, 0],
+        [0, 0, 0]]
 
-# Grab key safely
-
-api_key = os.getenv("OPENAI_API_KEY")
-print(api_key)
-if not api_key:
-    raise ValueError("OPENAI_API_KEY not found in .env or environment variables.")
-
-# Create client using the key explicitly
-client = OpenAI(api_key=api_key)
-
-response = client.chat.completions.create(
-    model="gpt-4",
-    messages=[{"role": "user", "content": "Hello!"}],
-    temperature=0.2
-)
-
-print(response.choices[0].message.content)
-
-
-
-
+alpha = krippendorff.alpha(reliability_data=data, level_of_measurement='nominal')
+print("Krippendorff's Alpha:", alpha)

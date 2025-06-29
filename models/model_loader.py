@@ -17,7 +17,7 @@ def load_models_from_config(config_path="config.yaml"):
     loaded_models = {}
 
     for name in model_names:
-        temperature = model_settings.get(name, {}).get("temperature", 0.7)
+        temperature = model_settings.get(name, {}).get("temperature", 0.0)
 
         if name in ["mistral", "llama3", "qwen:7b", "mixtral"]:
             loaded_models[name] = OllamaModel(model_name=name, temperature=temperature)
