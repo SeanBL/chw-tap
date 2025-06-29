@@ -4,6 +4,7 @@ import os
 from models.base_model import BaseModel
 from typing import List, Dict
 import json
+from utils.prompt_template import generate_prompt
 
 load_dotenv()
 
@@ -15,19 +16,7 @@ class GPTModel(BaseModel):
         self.client = OpenAI(api_key=self.api_key)
 
     def classify(self, text: str, labels: List[str]) -> Dict:
-        prompt = {
-            "role": "user",
-            "content": (
-                f"You're analyzing the following testimonial:\n\"{text}\"\n\n"
-                f"Given the categories: {labels}, return a JSON object mapping each category to a score between 0 and 1. "
-                f"Only include categories that apply. Then explain your reasoning in a separate field.\n\n"
-                f"Format your output exactly like this:\n"
-                f"{{\n"
-                f'  "labels": {{"label1": 0.8, "label2": 0.4}},\n'
-                f'  "explanation": "Reason for the scores."\n'
-                f"}}"
-            )
-        }
+        prompt = generate_prompt(text, labels)
 
         try:
             response = self.client.chat.completions.create(

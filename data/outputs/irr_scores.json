@@ -1,0 +1,43 @@
+{
+  "per_label": {
+    "training": {
+      "icc": 0.259,
+      "fleiss": -0.0,
+      "cohen": 0.133,
+      "krippendorff": 0.055,
+      "percent_agreement": 0.333
+    },
+    "trust": {
+      "icc": 0.869,
+      "fleiss": 0.55,
+      "cohen": 0.6,
+      "krippendorff": 0.78,
+      "percent_agreement": 0.667
+    },
+    "community impact": {
+      "icc": 0.457,
+      "fleiss": 0.1,
+      "cohen": 0.333,
+      "krippendorff": 0.172,
+      "percent_agreement": 0.333
+    },
+    "confidence": {
+      "icc": 0.155,
+      "fleiss": -0.286,
+      "cohen": 0.0,
+      "krippendorff": -0.044,
+      "percent_agreement": 0.333,
+      "cohen_notes": "No variation in binary labels for models mistral vs qwen:7b"
+    },
+    "knowledge sharing": {
+      "icc": -1.769,
+      "fleiss": -0.35,
+      "cohen": 0.0,
+      "krippendorff": -0.299,
+      "percent_agreement": 0.0
+    }
+  },
+  "overall": {
+    "krippendorff": 0.125
+  }
+}
