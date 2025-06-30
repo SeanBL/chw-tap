@@ -13,7 +13,13 @@ from pipeline.disagreement import (
     export_disagreements_to_excel,
     model_disagreement_percentages,
 )
+from pipeline.aggregate import (
+    aggregate_concept_frequencies,
+    compute_consensus_labels,
+    export_consensus_to_excel
+)
 import pandas as pd
+
 
 # Load config
 config = load_config()
@@ -37,11 +43,17 @@ if config.get("use_generated_labels"):
 else:
     labels = config["labels"]
 
+# Create normalized label map for use during classification and warnings
+normalized_labels = {label.strip().lower().replace("-", " ").replace("_", " "): label for label in labels}
+
 # Prepare output directory
 os.makedirs("data/outputs", exist_ok=True)
 
 # Initialize ratings for IRR
 ratings = []
+
+# Collect model explanations
+explanations_log = []
 
 # Run analysis
 with open(output_path, mode="w", newline="", encoding="utf-8") as csvfile:
@@ -56,7 +68,7 @@ with open(output_path, mode="w", newline="", encoding="utf-8") as csvfile:
         }
 
         for model_name, model in models.items():
-            result = model.classify(text, labels)
+            result = model.classify(text, labels, normalized_labels)
 
             if not result or "labels" not in result:
                 print(f"⚠️ Skipping model {model_name} due to invalid result.")
@@ -69,6 +81,14 @@ with open(output_path, mode="w", newline="", encoding="utf-8") as csvfile:
             for label in labels:
                 testimonial_ratings["labels"].setdefault(label, {})[model_name] = label_scores.get(label, 0.0)
 
+            # Save explanation log
+            explanations_log.append({
+                "testimonial": text,
+                "model": model_name,
+                "label_scores": json.dumps(label_scores, indent=2),
+                "explanation": explanation
+            })
+
             # Console output
             print(f"\n🤖 {model_name.upper()} Label Scores:")
             for label in labels:
@@ -79,7 +99,16 @@ with open(output_path, mode="w", newline="", encoding="utf-8") as csvfile:
             row = [model_name, text] + [label_scores.get(label, 0.0) for label in labels] + [explanation]
             writer.writerow(row)
 
+        print(f"✅ Collected ratings for testimonial {i + 1}: {len(testimonial_ratings['labels'])} labels")
+
         ratings.append(testimonial_ratings)
+
+        # Concept Frequency Aggregation
+        concept_frequencies = aggregate_concept_frequencies(ratings, model_names=list(models.keys()))
+
+        # Consensus Labeling
+        consensus_labels = compute_consensus_labels(ratings, method="vote", model_names=list(models.keys()))
+
 
 print(f"\n✅ Results saved to {output_path}")
 
@@ -106,20 +135,25 @@ disagreement_summary = summarize_disagreements(disagreement_df)
 flagged_testimonials = flag_high_disagreement_testimonials(disagreement_df, list(models.keys()))
 model_disagreement_summary = model_disagreement_percentages(disagreement_df)
 
-# # Save disagreement logs to Excel
-# disagreement_output_path = "data/outputs/model_disagreements.xlsx"
-# with pd.ExcelWriter(disagreement_output_path, engine="openpyxl") as writer:
-#     disagreement_df.to_excel(writer, sheet_name="Raw Disagreements", index=False)
-#     disagreement_summary.to_excel(writer, sheet_name="Summary", index=False)
-    
+# Convert explanations log to DataFrame
+explanations_df = pd.DataFrame(explanations_log)
+
+# Export Concept Frequency and Consensus to Excel
+concept_output_path = "data/outputs/concept_frequency_consensus.xlsx"
+with pd.ExcelWriter(concept_output_path, engine="openpyxl") as writer:
+    pd.DataFrame(concept_frequencies).to_excel(writer, sheet_name="Concept Frequencies", index=False)
+    pd.DataFrame(consensus_labels).to_excel(writer, sheet_name="Consensus Labels", index=False)
+
+print(f"📊 Concept frequency and consensus saved to {concept_output_path}")
+
 # Save disagreement logs to Excel with summary and flags
 disagreement_output_path = "data/outputs/model_disagreements.xlsx"
-export_disagreements_to_excel(
-    disagreement_df, 
-    disagreement_summary, 
-    flagged_testimonials,
-    model_disagreement_summary, 
-    disagreement_output_path
-)
+with pd.ExcelWriter(disagreement_output_path, engine="openpyxl") as writer:
+    disagreement_df.to_excel(writer, sheet_name="Disagreements", index=False)
+    disagreement_summary.to_excel(writer, sheet_name="Summary", index=False)
+    model_disagreement_summary.to_excel(writer, sheet_name="Model Summary", index=False)
+    if not flagged_testimonials.empty:
+        flagged_testimonials.to_excel(writer, sheet_name="Flagged", index=False)
+    explanations_df.to_excel(writer, sheet_name="Explanations", index=False)
 
 print(f"📉 Disagreement log saved to {disagreement_output_path}")
