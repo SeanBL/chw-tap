@@ -1,43 +1,44 @@
 {
   "per_label": {
     "training": {
-      "icc": 0.259,
-      "fleiss": -0.0,
-      "cohen": 0.133,
-      "krippendorff": 0.055,
-      "percent_agreement": 0.333
+      "icc": 0.067,
+      "fleiss": -0.35,
+      "cohen": 0.0,
+      "krippendorff": -0.086,
+      "percent_agreement": 0.0
     },
     "trust": {
-      "icc": 0.869,
-      "fleiss": 0.55,
-      "cohen": 0.6,
-      "krippendorff": 0.78,
+      "icc": 0.619,
+      "fleiss": 0.357,
+      "cohen": 0.333,
+      "krippendorff": 0.409,
       "percent_agreement": 0.667
     },
     "community impact": {
-      "icc": 0.457,
-      "fleiss": 0.1,
+      "icc": 0.807,
+      "fleiss": 0.357,
       "cohen": 0.333,
-      "krippendorff": 0.172,
-      "percent_agreement": 0.333
+      "krippendorff": 0.658,
+      "percent_agreement": 0.667
     },
     "confidence": {
-      "icc": 0.155,
+      "icc": 0.391,
       "fleiss": -0.286,
       "cohen": 0.0,
-      "krippendorff": -0.044,
+      "krippendorff": 0.122,
       "percent_agreement": 0.333,
       "cohen_notes": "No variation in binary labels for models mistral vs qwen:7b"
     },
     "knowledge sharing": {
-      "icc": -1.769,
-      "fleiss": -0.35,
+      "icc": 0.55,
+      "fleiss": -0.125,
       "cohen": 0.0,
-      "krippendorff": -0.299,
-      "percent_agreement": 0.0
+      "krippendorff": 0.232,
+      "percent_agreement": 0.667,
+      "cohen_notes": "No variation in binary labels for models mistral vs qwen:7b"
     }
   },
   "overall": {
-    "krippendorff": 0.125
+    "krippendorff": 0.24
   }
 }

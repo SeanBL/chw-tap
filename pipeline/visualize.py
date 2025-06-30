@@ -22,6 +22,19 @@ def visualize_irr_scores(irr_scores: dict, output_dir="data/outputs/visualizatio
         for label, scores in per_label.items():
             labels.append(label)
             values.append(scores[metric])
+        
+        # DEBUG
+        print(f"\n[DEBUG] Plotting IRR metric: {metric}")
+        print("[DEBUG] Labels:", labels)
+        print("[DEBUG] Values:", values)
+
+        # Convert values to float if necessary
+        try:
+            values = [float(v) for v in values]
+        except ValueError as e:
+            print("⚠️ Error: IRR score values must be numeric!", e)
+            continue
+
 
         plt.figure(figsize=(10, 5))
         plt.bar(labels, values)
