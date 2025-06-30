@@ -12,10 +12,10 @@ labels:
 models:
   - mistral
   - llama3
-  - qwen:7b
+  # - qwen:7b
   # - gpt
   # - claude
-  # - gemini
+  - gemini
 
 model_settings:
   mistral:
