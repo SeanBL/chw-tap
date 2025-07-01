@@ -1,42 +1,44 @@
 {
   "per_label": {
     "training": {
-      "icc": 0.935,
-      "fleiss": 1.0,
-      "cohen": 1.0,
-      "krippendorff": 0.842,
-      "percent_agreement": 1.0
+      "icc": 0.834,
+      "fleiss": 0.357,
+      "cohen": 0.333,
+      "krippendorff": 0.712,
+      "percent_agreement": 0.667
     },
     "trust": {
-      "icc": 0.899,
+      "icc": 0.958,
       "fleiss": 1.0,
       "cohen": 1.0,
-      "krippendorff": 0.823,
+      "krippendorff": 0.923,
       "percent_agreement": 1.0
     },
     "community impact": {
-      "icc": 0.891,
+      "icc": 0.96,
       "fleiss": 1.0,
       "cohen": 1.0,
-      "krippendorff": 0.757,
+      "krippendorff": 0.931,
       "percent_agreement": 1.0
     },
     "confidence": {
-      "icc": 0.52,
-      "fleiss": -0.0,
-      "cohen": 0.133,
-      "krippendorff": 0.3,
-      "percent_agreement": 0.333
+      "icc": 0.636,
+      "fleiss": -0.125,
+      "cohen": 0.0,
+      "krippendorff": 0.452,
+      "percent_agreement": 0.667,
+      "cohen_notes": "No variation in binary labels for models gpt vs claude"
     },
     "knowledge sharing": {
-      "icc": 0.741,
-      "fleiss": 0.357,
-      "cohen": 0.333,
-      "krippendorff": 0.459,
-      "percent_agreement": 0.667
+      "icc": 0.408,
+      "fleiss": NaN,
+      "cohen": "N/A",
+      "krippendorff": 0.158,
+      "percent_agreement": 1.0,
+      "cohen_notes": "No variation in binary labels for models claude vs gemini"
     }
   },
   "overall": {
-    "krippendorff": 0.639
+    "krippendorff": 0.77
   }
 }

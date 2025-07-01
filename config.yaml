@@ -10,11 +10,11 @@ labels:
   - knowledge sharing
 
 models:
-  - mistral
-  - llama3
+  # - mistral
+  # - llama3
   # - qwen:7b
-  # - gpt
-  # - claude
+  - gpt
+  - claude
   - gemini
 
 model_settings:
