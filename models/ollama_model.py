@@ -8,12 +8,14 @@ import nltk
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
 import re
+from ollama import Client
 
 class OllamaModel(BaseModel):
     def __init__(self, model_name="mistral", temperature: float = 0.0):
         self.api_url = "http://localhost:11434/api/generate"
         self.model_name = model_name
         self.temperature = temperature
+        self.client = Client()
 
     def classify(self, text: str, labels: List[str], normalized_labels: Dict[str, str]) -> Dict:
         prompt = generate_prompt(text, labels)
@@ -128,3 +130,16 @@ class OllamaModel(BaseModel):
             return match.group(0)
 
         raise ValueError("No valid JSON object found in Ollama output.")
+    
+    def generate(self, prompt: str, system_prompt: str) -> str:
+        response = self.client.chat(
+            model=self.model_name,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+            options={
+                "temperature": self.temperature
+            }
+        )
+        return response["message"]["content"]

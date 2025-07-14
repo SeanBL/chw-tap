@@ -87,5 +87,21 @@ class GPTModel(BaseModel, ModelSafetyMixin):
                 "binned_labels": {label: 0 for label in labels},
                 "explanation": f"Failed to parse JSON: {str(e)}"
             }
+        
+    def generate(self, prompt: str, system_prompt: str = "") -> str:
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=self.temperature
+                # ❌ Remove response_format for now
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            print(f"[ERROR] GPT generate() failed: {e}")
+            raise e
 
 
