@@ -40,3 +40,13 @@ def load_models_from_config(config_path="config.yaml"):
 
     return loaded_models
 
+# Unified interface to call any loaded model by name
+def get_model_response(prompt: str, system_prompt: str, model: str, provider: str) -> str:
+    models = load_models_from_config()
+
+    model_instance = models.get(model)
+
+    if not model_instance:
+        raise ValueError(f"Model '{model}' is not loaded or supported.")
+
+    return model_instance.generate(prompt, system_prompt)

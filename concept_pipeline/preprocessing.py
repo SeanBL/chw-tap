@@ -36,18 +36,33 @@ def extract_testimonials(doc_path: str) -> List[Dict]:
     raw_text = [clean_line(p.text) for p in doc.paragraphs if p.text.strip()]
 
     entries = []
-    entry = OrderedDict({"topic": "unknown", "speaker": "unknown", "date": "unknown", "content": []})
+    entry = OrderedDict({
+        "topic": "unknown",
+        "speaker": "unknown",
+        "gender": "unknown",
+        "date": "unknown",
+        "content": []
+    })
 
     for line in raw_text:
-        if line.lower().startswith("topic title:"):
+        lower = line.lower()
+        if lower.startswith("topic title:"):
             if entry["content"]:
                 entry["content"] = merge_short_lines(entry["content"])
                 entries.append(entry)
-                entry = OrderedDict({"topic": "unknown", "speaker": "unknown", "date": "unknown", "content": []})
+                entry = OrderedDict({
+                    "topic": "unknown",
+                    "speaker": "unknown",
+                    "gender": "unknown",
+                    "date": "unknown",
+                    "content": []
+                })
             entry["topic"] = line.split(":", 1)[-1].strip() or "unknown"
-        elif line.lower().startswith("speaker:"):
+        elif lower.startswith("speaker:"):
             entry["speaker"] = line.split(":", 1)[-1].strip() or "unknown"
-        elif line.lower().startswith("date:"):
+        elif lower.startswith("gender:"):
+            entry["gender"] = line.split(":", 1)[-1].strip() or "unknown"
+        elif lower.startswith("date:"):
             entry["date"] = line.split(":", 1)[-1].strip() or "unknown"
         else:
             entry["content"].append(line)

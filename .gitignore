@@ -25,5 +25,16 @@ env/
 # Ignore Excel lock files
 ~$*.xlsx
 
-# Ignore all visualizations
+# Ignore all visual outputs
+data/outputs/irr_scores.json
+data/outputs/irr_scores.xlsx
+data/outputs/model_disagreements.xlsx
+data/outputs/concept_frequency_consensus.xlsx
 data/outputs/visualizations/
+
+# Ignore raw and intermediate data
+data/raw/
+data/validated/
+
+# Ignore generated JSON ratings
+data/outputs/classification_ratings.json

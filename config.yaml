@@ -1,7 +1,3 @@
-use_generated_labels: false    # or false
-# labels: []                    # ignored if use_generated_labels is true
-# label_source: "bertopic"      # or "top2vec", "tfidf", etc.
-
 labels:
   - training
   - trust
@@ -9,13 +5,15 @@ labels:
   - confidence
   - knowledge sharing
 
+n_clusters: 20
+
 models:
   # - mistral
   # - llama3
   # - qwen:7b
   - gpt
-  - claude
-  - gemini
+  # - claude
+  # - gemini
 
 model_settings:
   mistral:
