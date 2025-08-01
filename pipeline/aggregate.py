@@ -7,15 +7,35 @@ import os
 def aggregate_concept_frequencies(ratings: List[Dict], model_names: List[str]) -> pd.DataFrame:
     """
     Returns a DataFrame with counts and mean scores per label per model.
+    Assumes each testimonial entry corresponds to a single model.
     """
     rows = []
+    print("DEBUG: First rating entry:", ratings[0] if ratings else "No data")
     for testimonial in ratings:
-        for label, model_scores in testimonial["labels"].items():
-            for model in model_names:
-                score = model_scores.get(model, 0.0)
-                rows.append({"label": label, "model": model, "score": score})
+        model = testimonial.get("model", "unknown")  # fallback to "unknown" if missing
+        labels = testimonial.get("labels", {})
+        if not isinstance(labels, dict):
+            continue  # skip malformed rows
+
+        for label, model_scores in labels.items():
+            if isinstance(model_scores, dict):
+                for model, score in model_scores.items():
+                    rows.append({
+                        "label": label,
+                        "model": model,
+                        "score": score
+                    })
+            else:
+                print(f"⚠️ Unexpected format for label '{label}':", model_scores)
 
     df = pd.DataFrame(rows)
+    print("DEBUG: df.columns =", df.columns.tolist())
+    print(df.head())
+
+    if df.empty:
+        print("⚠️ No label scores found in the ratings. Skipping frequency aggregation.")
+        return pd.DataFrame(columns=["label", "model", "count", "mean_score"])
+
     return df.groupby(["label", "model"]).agg(
         count=("score", "count"),
         mean_score=("score", "mean")

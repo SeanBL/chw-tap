@@ -64,7 +64,24 @@ def compute_irr_scores(ratings: List[Dict[str, Dict[str, float]]], threshold: fl
 
         cohen = round(np.mean(cohen_scores), 3) if cohen_scores else "N/A"
 
-        kripp = krippendorff.alpha(reliability_data=np.array(label_scores).T, level_of_measurement='interval')
+        # Krippendorff's alpha with variability check
+
+        flat_values = list(np.array(label_scores).flatten())
+        unique_values = set(flat_values)
+
+        if len(unique_values) < 2:
+            kripp = "N/A (no variability)"
+            print(f"[INFO] Skipping Krippendorff for label '{label}' due to identical scores: {unique_values}")
+        else:
+            try:
+                kripp = krippendorff.alpha(
+                    reliability_data=np.array(label_scores).T,
+                    level_of_measurement='interval'
+                )
+                kripp = round(kripp, 3)
+            except Exception as e:
+                kripp = "N/A"
+                print(f"[WARN] Krippendorff failed for label '{label}': {e}")
 
         percent = np.mean([
             len(set([row[i] >= threshold for i in range(len(row))])) == 1
@@ -75,7 +92,7 @@ def compute_irr_scores(ratings: List[Dict[str, Dict[str, float]]], threshold: fl
             "icc": round(icc, 3),
             "fleiss": round(fleiss, 3),
             "cohen": cohen,
-            "krippendorff": round(kripp, 3),
+            "krippendorff": kripp,
             "percent_agreement": round(percent, 3)
         }
 
@@ -83,12 +100,25 @@ def compute_irr_scores(ratings: List[Dict[str, Dict[str, float]]], threshold: fl
             per_label_results[label]["cohen_notes"] = cohen_notes
 
     # Overall Krippendorff
-    overall_kripp = krippendorff.alpha(reliability_data=np.array(all_scores_matrix).T, level_of_measurement='interval')
+    flat_all_values = list(np.array(all_scores_matrix).flatten())
+    if len(set(flat_all_values)) < 2:
+        overall_kripp = "N/A (no variability)"
+        print("[INFO] Skipping overall Krippendorff: all values are identical.")
+    else:
+        try:
+            overall_kripp = krippendorff.alpha(
+                reliability_data=np.array(all_scores_matrix).T,
+                level_of_measurement='interval'
+            )
+            overall_kripp = round(overall_kripp, 3)
+        except Exception as e:
+            overall_kripp = "N/A"
+            print(f"[WARN] Krippendorff failed for overall: {e}")
 
     return {
         "per_label": per_label_results,
         "overall": {
-            "krippendorff": round(overall_kripp, 3),
+            "krippendorff": overall_kripp,
         }
     }
 

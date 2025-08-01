@@ -1,44 +1,265 @@
 {
   "per_label": {
-    "training": {
-      "icc": 0.834,
-      "fleiss": 0.357,
-      "cohen": 0.333,
-      "krippendorff": 0.712,
-      "percent_agreement": 0.667
+    "CHW Empowerment Through Training": {
+      "icc": 0.711,
+      "fleiss": 0.449,
+      "cohen": 0.483,
+      "krippendorff": 0.623,
+      "percent_agreement": 0.76
     },
-    "trust": {
-      "icc": 0.958,
+    "Menstrual Hygiene Education and Challenges": {
+      "icc": 0.995,
       "fleiss": 1.0,
       "cohen": 1.0,
-      "krippendorff": 0.923,
+      "krippendorff": 0.993,
       "percent_agreement": 1.0
     },
-    "community impact": {
-      "icc": 0.96,
-      "fleiss": 1.0,
-      "cohen": 1.0,
-      "krippendorff": 0.931,
-      "percent_agreement": 1.0
-    },
-    "confidence": {
-      "icc": 0.636,
-      "fleiss": -0.125,
-      "cohen": 0.0,
-      "krippendorff": 0.452,
-      "percent_agreement": 0.667,
-      "cohen_notes": "No variation in binary labels for models gpt vs claude"
-    },
-    "knowledge sharing": {
-      "icc": 0.408,
+    "Drug Abuse: Environment and Awareness": {
+      "icc": -0.004,
       "fleiss": NaN,
       "cohen": "N/A",
-      "krippendorff": 0.158,
+      "krippendorff": -0.008,
       "percent_agreement": 1.0,
-      "cohen_notes": "No variation in binary labels for models claude vs gemini"
+      "cohen_notes": "No variation in binary labels for models o3 vs claude"
+    },
+    "CHW-Led Infectious Disease Management": {
+      "icc": 0.985,
+      "fleiss": 1.0,
+      "cohen": 1.0,
+      "krippendorff": 0.975,
+      "percent_agreement": 1.0
+    },
+    "Water Quality, Sanitation, and Hygiene": {
+      "icc": 0.843,
+      "fleiss": 0.621,
+      "cohen": 0.627,
+      "krippendorff": 0.794,
+      "percent_agreement": 0.92
+    },
+    "Personal Disease Management and Adherence": {
+      "icc": 0.865,
+      "fleiss": 0.48,
+      "cohen": 0.49,
+      "krippendorff": 0.817,
+      "percent_agreement": 0.8
+    },
+    "Nutrition Education and Food Access": {
+      "icc": 0.987,
+      "fleiss": 1.0,
+      "cohen": 1.0,
+      "krippendorff": 0.983,
+      "percent_agreement": 1.0
+    },
+    "Sexual and Reproductive Health Education": {
+      "icc": 0.991,
+      "fleiss": 1.0,
+      "cohen": 1.0,
+      "krippendorff": 0.988,
+      "percent_agreement": 1.0
+    },
+    "Gender-Based Violence (GBV) and Child Protection": {
+      "icc": 0.93,
+      "fleiss": 1.0,
+      "cohen": 1.0,
+      "krippendorff": 0.907,
+      "percent_agreement": 1.0
+    },
+    "Health Literacy and Misconceptions": {
+      "icc": 0.864,
+      "fleiss": 0.679,
+      "cohen": 0.682,
+      "krippendorff": 0.814,
+      "percent_agreement": 0.84
+    },
+    "Mental Health Awareness and Support": {
+      "icc": 0.962,
+      "fleiss": 1.0,
+      "cohen": 1.0,
+      "krippendorff": 0.949,
+      "percent_agreement": 1.0
+    },
+    "Referrals and Advocacy": {
+      "icc": 0.907,
+      "fleiss": 0.576,
+      "cohen": 0.593,
+      "krippendorff": 0.867,
+      "percent_agreement": 0.8
+    },
+    "Community Empowerment Through Education": {
+      "icc": 0.799,
+      "fleiss": 0.236,
+      "cohen": 0.267,
+      "krippendorff": 0.741,
+      "percent_agreement": 0.64
+    },
+    "Resource and Material Distribution": {
+      "icc": 0.937,
+      "fleiss": 1.0,
+      "cohen": 1.0,
+      "krippendorff": 0.913,
+      "percent_agreement": 1.0
+    },
+    "Monitoring and Follow-Up": {
+      "icc": 0.962,
+      "fleiss": 0.883,
+      "cohen": 0.884,
+      "krippendorff": 0.948,
+      "percent_agreement": 0.96
+    },
+    "Trust and Cultural Mediation": {
+      "icc": 0.823,
+      "fleiss": 0.653,
+      "cohen": 0.662,
+      "krippendorff": 0.75,
+      "percent_agreement": 0.84
+    },
+    "Clinical Interventions by CHWs": {
+      "icc": 0.797,
+      "fleiss": 0.778,
+      "cohen": 0.779,
+      "krippendorff": 0.725,
+      "percent_agreement": 0.96
+    },
+    "Mother and Infant Care": {
+      "icc": 0.843,
+      "fleiss": 0.645,
+      "cohen": 0.648,
+      "krippendorff": 0.768,
+      "percent_agreement": 0.96
+    },
+    "Successful Outcomes": {
+      "icc": 0.864,
+      "fleiss": 0.5,
+      "cohen": 0.528,
+      "krippendorff": 0.813,
+      "percent_agreement": 0.76
+    },
+    "Material or Training Requests": {
+      "icc": -0.124,
+      "fleiss": NaN,
+      "cohen": "N/A",
+      "krippendorff": -0.205,
+      "percent_agreement": 1.0,
+      "cohen_notes": "No variation in binary labels for models o3 vs claude"
+    },
+    "Children Served": {
+      "icc": 0.976,
+      "fleiss": 0.905,
+      "cohen": 0.905,
+      "krippendorff": 0.968,
+      "percent_agreement": 0.96
+    },
+    "Elderly Served": {
+      "icc": NaN,
+      "fleiss": NaN,
+      "cohen": "N/A",
+      "krippendorff": "N/A (no variability)",
+      "percent_agreement": 1.0,
+      "cohen_notes": "No variation in binary labels for models o3 vs claude"
+    },
+    "Women Served": {
+      "icc": 0.98,
+      "fleiss": 0.919,
+      "cohen": 0.92,
+      "krippendorff": 0.974,
+      "percent_agreement": 0.96
+    },
+    "Men Served": {
+      "icc": 0.982,
+      "fleiss": 0.778,
+      "cohen": 0.779,
+      "krippendorff": 0.975,
+      "percent_agreement": 0.96
+    },
+    "Families Served": {
+      "icc": 0.945,
+      "fleiss": 0.834,
+      "cohen": 0.834,
+      "krippendorff": 0.927,
+      "percent_agreement": 0.96
+    },
+    "Marginalized Groups Served": {
+      "icc": 0.912,
+      "fleiss": 0.816,
+      "cohen": 0.818,
+      "krippendorff": 0.877,
+      "percent_agreement": 0.92
+    },
+    "Financial Hardship": {
+      "icc": 0.934,
+      "fleiss": 1.0,
+      "cohen": 1.0,
+      "krippendorff": 0.91,
+      "percent_agreement": 1.0
+    },
+    "Social Isolation": {
+      "icc": 0.499,
+      "fleiss": NaN,
+      "cohen": "N/A",
+      "krippendorff": 0.414,
+      "percent_agreement": 1.0,
+      "cohen_notes": "No variation in binary labels for models o3 vs claude"
+    },
+    "Disease Burden": {
+      "icc": 0.832,
+      "fleiss": 0.513,
+      "cohen": 0.513,
+      "krippendorff": 0.784,
+      "percent_agreement": 0.76
+    },
+    "Stigma or Discrimination": {
+      "icc": 0.7,
+      "fleiss": -0.02,
+      "cohen": 0.0,
+      "krippendorff": 0.628,
+      "percent_agreement": 0.96
+    },
+    "Mental or Emotional Distress": {
+      "icc": 0.968,
+      "fleiss": 1.0,
+      "cohen": 1.0,
+      "krippendorff": 0.956,
+      "percent_agreement": 1.0
+    },
+    "Lack of Resources": {
+      "icc": 0.769,
+      "fleiss": 0.645,
+      "cohen": 0.648,
+      "krippendorff": 0.693,
+      "percent_agreement": 0.96
+    },
+    "Systemic Barriers": {
+      "icc": 0.904,
+      "fleiss": 0.864,
+      "cohen": 0.865,
+      "krippendorff": 0.865,
+      "percent_agreement": 0.96
+    },
+    "Overburdened CHWs": {
+      "icc": 0.701,
+      "fleiss": NaN,
+      "cohen": "N/A",
+      "krippendorff": 0.599,
+      "percent_agreement": 1.0,
+      "cohen_notes": "No variation in binary labels for models o3 vs claude"
+    },
+    "Lack of Follow-Through": {
+      "icc": 0.767,
+      "fleiss": NaN,
+      "cohen": "N/A",
+      "krippendorff": 0.669,
+      "percent_agreement": 1.0,
+      "cohen_notes": "No variation in binary labels for models o3 vs claude"
+    },
+    "Lack of Knowledge": {
+      "icc": 0.9,
+      "fleiss": 0.834,
+      "cohen": 0.834,
+      "krippendorff": 0.869,
+      "percent_agreement": 0.96
     }
   },
   "overall": {
-    "krippendorff": 0.77
+    "krippendorff": 0.92
   }
 }

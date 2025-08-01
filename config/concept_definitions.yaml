@@ -1,0 +1,318 @@
+"CHW Empowered Through Training":
+  definition: Community Health Workers (CHWs) receiving training that increases their
+    capacity to serve.
+  inclusion: Mentions of CHWs gaining knowledge, attending workshops, or being trained.
+  exclusion: Formal education unrelated to CHW roles.
+  examples:
+  - “After CHW training, I began teaching others about disease prevention.” → 0.9
+  - “I lead community sessions now, though I’ve never attended formal training.” →
+    0.4
+  - “I started giving advice to neighbors based on what I learned informally.” → 0.2
+
+"Menstrual Hygiene Education and Challenges":
+  definition: Addresses access, stigma, or education about menstruation across genders
+    and age groups.
+  inclusion: Testimonials discussing menstruation education, lack of products, or
+    community awareness.
+  exclusion: General hygiene not related to menstruation.
+  examples:
+  - “I provided sanitary pads and education on menstruation.” → 0.9
+  - “I raised concerns about limited menstrual supplies and its impact on daily life.”
+    → 0.5
+  - “Hygiene is important for women.” → 0.2
+
+"Drug Abuse: Environment and Awareness":
+  definition: Explores how social and environmental factors, plus lack of education,
+    contribute to substance abuse.
+  inclusion: Mentions of addiction, alcohol abuse, peer influence, lack of drug education.
+  exclusion: Clinical descriptions of drug use without social/environmental context.
+  examples:
+  - “I educated the community about substance abuse and its link to peer pressure.”
+    → 0.9
+  - “People in my area are turning to drugs due to lack of opportunities.” → 0.6
+  - “Some residents drink heavily.” → 0.22
+
+"CHW-Led Infectious Disease Management":
+  definition: Focuses on how CHWs help communities prepare for, understand, and reduce
+    the spread of infectious diseases (e.g., TB, COVID-19) through outreach and education
+  inclusion: Mentions of CHWs explaining symptoms, prevention, or follow-ups for diseases.
+  exclusion: Mentions of diseases without CHW involvement.
+  examples:
+  - “I educated the community about disease prevention and symptoms.” → 0.9
+  - “People in my area are scared of diseases, so I told them to wear masks.” → 0.6
+  - “People know about infectious diseases now.” → 0.2
+
+"Water Quality, Sanitation, and Hygiene":
+  definition: Importance of clean water, sanitation, and hygiene education in preventing
+    disease.
+  inclusion: Discussions about handwashing, water treatment, sanitation practices.
+  exclusion: Personal hygiene not tied to water or community sanitation.
+  examples:
+  - “I showed families how to boil and store drinking water safely.” → 0.9
+  - “I led handwashing demos with clean water and soap.” → 0.8
+  - “People now wash hands more due to COVID-19.” → 0.5
+  - “I tell people to stay clean.” → 0.1
+
+"Personal Disease Management and Adherence":
+  definition: Highlights how individuals manage chronic or infectious diseases through
+    diagnosis, treatment adherence, and lifestyle adjustments, often as a result of
+    guidance from community health workers.
+  inclusion: Testimonials about sticking to medication, managing TB, malaria, etc.
+  exclusion: Mentions examples that lack a disease management or diagnosis context.
+  examples:
+  - “I helped someone stick to their medication schedule.” → 0.9
+  - “I gave advice on managing high blood pressure with daily treatment.” → 0.7
+  - “I mentioned health issues in the community.” → 0.3
+  - “I visited homes.” → 0.0
+
+"Nutrition Education and Food Access":
+  definition: Promotes awareness of healthy eating and access to adequate nutrition.
+  inclusion: Describes food insecurity, learning about healthy meals, or feeding children.
+  exclusion: Weight gain/loss issues unrelated to nutrition education or food access.
+  examples:
+  - “I taught families how to prepare balanced meals using local ingredients.” → 0.9
+  - “Community members were advised to eat more fruits and vegetables.” → 0.6
+  - “Some residents have gained weight recently.” → 0.2
+  - “People are concerned about food prices.” → 0.1
+
+"Sexual and Reproductive Health Education":
+  definition: Covers family planning, STI prevention, HIV awareness, and reproductive
+    rights.
+  inclusion: Mentions of condoms, family planning, STI myths, or safe sex education.
+  exclusion: Pregnancy stories without a health education focus.
+  examples:
+  - “I provided condoms and discussed STI prevention.” → 0.9
+  - “There was a group discussion about family planning and birth spacing.” → 0.7
+  - “A woman became pregnant and shared her story.” → 0.2
+  - “People talked about relationships.” → 0.0
+
+"Gender-Based Violence (GBV) and Child Protection":
+  definition: Discusses health consequences and CHW support around abuse, exploitation,
+    or violence.
+  inclusion: Stories of GBV, child abuse, CHW interventions, or counseling.
+  exclusion: General emotional distress without reference to violence or abuse.
+  examples:
+  - “I helped a person who was being abused by someone in their household.” → 0.9
+  - “Someone expressed emotional distress, but didn’t mention violence or abuse.”
+    → 0.2
+  - “I visited a household and had a casual conversation.” → 0.0
+
+"Health Literacy and Misconceptions":
+  definition: Effects of misinformation or lack of knowledge on health decisions or outcomes.
+  inclusion: Misbeliefs about disease origins, mistrust in medicine, or misunderstood symptoms.
+  exclusion: Accurate health discussions with no misunderstanding present.
+  examples:
+  - “I corrected misinformation that diseases are caused by witchcraft.” → 0.9
+  - “Some people don’t believe in vaccines, and I spoke to them.” → 0.5
+  - “People are confused about how diseases spread.” → 0.2
+  
+"Mental Health Awareness and Support":
+  definition: Recognizes psychological well-being and support from CHWs or the community.
+  inclusion: Feelings of depression, anxiety, loneliness, or emotional trauma.
+  exclusion: Medical diagnoses without a mental/emotional context.
+  examples:
+  - “I supported someone showing signs of depression and got them counseling.” → 0.9
+  - “I talked to someone who was stressed and told them to rest.” → 0.5
+  - “Some people are sad these days.” → 0.1
+
+"Referrals and Advocacy":
+  definition: CHWs act as intermediaries, advocates, or navigators within the health system.
+  inclusion: Mentions of assisting with referrals, setting appointments, accompanying someone to care, or advocating on someone’s behalf in a healthcare setting.
+  exclusion: General health education or advice without CHW involvement in system navigation. No follow-up, referral, or connection to services.
+  examples:
+  - “I identified disease symptoms and referred the person for testing.” → 0.9
+  - “I encouraged someone to go to the clinic.” → 0.5
+  - “I told people they should consider family planning.” → 0.2
+
+"Community Empowerment Through Education":
+  definition: CHWs provide health education or training to individuals or groups, helping community members gain knowledge or awareness to improve health practices, regardless of whether long‑term behavior change is observed.
+  inclusion: One‑on‑one or group education by CHWs. Workshops, training sessions, health talks, or mobilization for services (e.g., vaccination drives). Explaining health topics or giving practical instructions to increase understanding.
+  exclusion: Purely clinical tasks (e.g., giving medicine) without any explanation or teaching. General statements with no sign of knowledge transfer.
+  examples:
+  - “I trained families on safe water storage.” → 0.9
+  - “I explained to a mother how to give ORS for her child’s diarrhea.” → 0.6
+  - “I only handed out medicine without any explanation.” → 0.1
+
+"Handing out Medical Supplies":
+  definition: Community health workers provide essential supplies such as medication, food, hygiene kits, or educational materials to individuals or groups in the community.
+  inclusion: Mentions of CHWs giving out health kits, medicine, food, or distributing resources during health campaigns.
+  exclusion: Discussions of education or advice without material support.
+  examples:
+  - “I distributed malaria nets in the neighborhood and taught families how to use them.” → 0.9
+  - “I talked to the group about hygiene kits, but didn't distribute them yet.” → 0.4
+  - “I gave general advice that day; I didn't bring any supplies.” → 0.1
+
+"Monitoring and Follow-Up":
+  definition: Ongoing interactions between CHWs and individuals to check progress, reinforce guidance, and adjust care as needed.
+  inclusion: Testimonials about CHWs returning to homes, checking health status, or following up after a diagnosis.
+  exclusion: One-time visits or initial health education sessions with no follow-up.
+  examples:
+  - “I went back to check on a person with a fever to see if the medicine helped.” → 0.9
+  - “I gave advice about malaria during a house visit last month.” → 0.4
+  - “I visited homes to tell people about disease prevention.” → 0.1
+
+"Bridge Between Community and Health System":
+  definition: CHWs build trust and navigate cultural, linguistic, or social barriers to ensure effective communication and care delivery between communities and health systems.
+  inclusion: Mentions of CHWs explaining mistrusted practices, translating unfamiliar terms, reassuring those hesitant about care, or earning trust in a context of fear, confusion, or cultural difference.
+  exclusion: Health education or clinical support without any indication of mistrust, confusion, or cultural/social barriers. General encouragement, advising, or accompaniment on its own is not sufficient.
+  examples:
+  - “Some people didn’t trust the hospital, so I explained how the treatment works.” → 0.9
+  - “I shared health information, but some families still seemed unsure.” → 0.4
+  - “I advise people and sometimes take them to the hospital.” → 0.2
+  - “I gave out leaflets about nutrition.” → 0.1
+
+"Clinical Interventions by CHWs":
+  definition: Describes CHWs administering or assisting with basic medical tasks such as providing over-the-counter medication, treating wounds, or managing minor physical injuries.
+  inclusion: Mentions of CHWs giving medicine, bandaging injuries, applying ointments, or helping with physical ailments directly.
+  exclusion: Health education or referrals without direct clinical interaction.
+  examples:
+  - “I cleaned and bandaged a cut for a person before sending that person to the clinic.” → 0.9
+  - “I told a mother to take her child to the hospital for their rash.” → 0.4
+  - “I spoke to the group about taking care of wounds.” → 0.1
+
+"Mother and Infant Care":
+  definition: Refers to CHW support related to prenatal, childbirth, postpartum care, or infant health and nutrition.
+  inclusion: Mentions of support during pregnancy, birth preparation, infant feeding, immunizations, or postpartum checkups.
+  exclusion: General family or women’s health support not specific to mother/infant.
+  examples:
+  - “I visited a new mother at home and reminded her to keep the baby warm, breastfeed often, and watch for signs of fever.” → 0.9
+  - “I talked about prenatal nutrition and encouraged families to visit the clinic.” → 0.7
+  - “I gave health advice to some women.” → 0.1
+
+"Direct Clinical Outcomes":
+  definition: Cases where a community health worker directly performs a clinical task within their scope and there is a clear, observed improvement or resolution for the patient.
+  inclusion: Administering ORS+zinc with diarrhea subsiding. Performing a malaria RDT, giving ACT, fever resolves. Wound care/dressing with healing noted on follow‑up. Vaccination preventing symptoms. Contraceptive provision with immediate clinical effect noted or symptom improvement. First aid with immediate improvement.
+  exclusion: General community programs or CHW education efforts without a patient-level outcome. Referrals or escorts only (outcome unknown or occurs after facility care). Screening only with no observed improvement. Community benefit statements without a specific patient improvement.
+  examples:
+  - “I gave ACT, and the child’s fever resolved by the next day.” → 0.95
+  - “I changed the wound dressing over two visits; it healed without infection.” → 0.9
+  - “I escorted a person to the hospital and they recovered.” → 0.2
+  - “I referred a sick person to the clinic.” → 0.1
+
+"Children Served":
+  definition: Refers to minors under 18 years old.
+  inclusion: Mentions of support for children or adolescents in health, education, or safety.
+  exclusion: References to youth that don't imply CHW involvement or care.
+  examples:
+  - “I taught children how to properly wash their hands to prevent disease, and gave each of them a bar of soap to take home.” → 0.9
+  - “There were many children at the training, but I focused mostly on speaking to the mothers.” → 0.4
+  - “I passed by a group of children playing but didn’t speak with them.” → 0.1
+
+"Elderly Served":
+  definition: Refers to older adults, often described as seniors or grandparents.
+  inclusion: CHWs helping seniors with mobility, medicine, or emotional support.
+  exclusion: General aging references without direct assistance or CHW context.
+  examples:
+  - “I visited an elderly person who had trouble walking and helped that person get their medication from the local dispensary.” → 0.9
+  - “There were a few elderly people at the health meeting, but we didn’t focus on their needs specifically.” → 0.4
+  - “Old age is difficult, and many people suffer, especially with no family around.” → 0.1
+
+"Women Served":
+  definition: Adult females or girls described in the context of gendered roles or challenges.
+  inclusion: Assistance or education for women, especially around health or safety.
+  exclusion: Mentions of women without CHW interaction or specific need addressed.
+  examples:
+  - “I talked with a group of young women about how to protect themselves during pregnancy and gave them referrals for antenatal care.” → 0.9
+  - “There were many women at the event, and I mentioned some general health tips.” → 0.4
+  - “Women in our community have many challenges.” → 0.1
+
+"Men Served":
+  definition: Adult males or boys described in the context of gendered roles or challenges.
+  inclusion: Support for men or boys, especially regarding health, violence, or stigma.
+  exclusion: General references to men without clear support or issue context.
+  examples:
+  - “I counseled a man who was afraid to seek HIV testing and accompanied him to the clinic for support.” → 0.9
+  - “A few men attended the session, but I didn’t speak to them directly.” → 0.4
+  - “Men need to take more responsibility for their health.” → 0.1
+
+"Families Served":
+  definition: Mentions of households, parents with children, or extended family units.
+  inclusion: CHW support for multiple members or family-focused interventions.
+  exclusion: Individual help not connected to a family unit or structure.
+  examples:
+  - “I visited a household where both parents and children had flu symptoms and showed them how to isolate and care for each other safely.” → 0.9
+  - “I spoke to a woman about nutrition, and she mentioned her husband and children.” → 0.4
+  - “I gave advice to one man who said he lived nearby.” → 0.1
+
+"Marginalized Groups Served":
+  definition: Includes those facing structural or social exclusion (e.g., disabled, migrants, minority groups).
+  inclusion: Support provided to stigmatized or underserved groups.
+  exclusion: Group mentions without reference to marginalization or CHW support.
+  examples:
+  - “I helped a person living with HIV who had been afraid to seek treatment due to community stigma. I provided education and confidential support.” → 0.9
+  - “I helped someone with common health issues, but the person was not from a marginalized or underserved group.” → 0.4
+  - “I spoke with people in the community.” → 0.1
+
+"Lack of Financial Resources for Healthcare":
+  definition: Inability to afford transportation, food, or basic medical needs.
+  inclusion: Statements of poverty, lack of income, or material scarcity.
+  exclusion: Emotional hardship not tied to financial status.
+  examples:
+  - “I referred a patient to a free clinic because they couldn't afford care.” → 0.8
+  - “The person I spoke with was unable to get to a clinic or hospital because of transportation costs” → 0.9
+  - “It’s hard to live with no job.” → 0.2
+
+"Social Isolation or Emotional Distress":
+  definition: Situations where a person (a) lacks supportive relationships or is cut off from others or (b) shows significant mental/emotional suffering (e.g., persistent sadness, grief, anxiety).
+  inclusion: Lives alone and lacks help/companionship; abandonment or neglect. Expressed loneliness with little or no support network. Clear emotional distress affecting daily functioning.
+  exclusion: Voluntary solitude or isolation unrelated to care barriers.
+  examples:
+  - “I visited a person who lives alone and had no one to care for them. I now check in weekly to help with that person's medication and provide companionship.” → 0.9
+  - “She cried throughout the visit and said she feels hopeless since her husband died.” → 0.9
+  - “I spoke to someone who felt lonely after moving to a new area but had not lost contact with family or support systems.” → 0.4
+  - “I spoke with someone who prefers to live alone and doesn't want visitors.” → 0.1
+
+"Disease Burden":
+  definition: Chronic illness, disability, or frequent illness episodes.
+  inclusion: References to long-term or recurrent illness or disability.
+  exclusion: Short-term illness without major life impact or context.
+  examples:
+  - “I regularly visit a person with diabetes to monitor their blood sugar and ensure they adhere to their treatment plan.” → 0.9
+  - “I helped someone recover from a cold and advised them on rest and hydration.” → 0.4
+  - “I spoke with community members about general wellness.” → 0.1
+
+"Stigma or Discrimination":
+  definition: Social rejection or judgment due to health condition, gender, or identity.
+  inclusion: Mentions of shame, exclusion, or judgment from others.
+  exclusion: General fear or discomfort not caused by social rejection.
+  examples:
+  - “I supported a person who was shunned by their community after disclosing their HIV status.” → 0.9
+  - “Some people feel ashamed to seek treatment but didn’t explain why.” → 0.4
+  - “I helped community members understand how to stay healthy.” → 0.1
+
+"Lack of Resources":
+  definition: CHWs lacking medicine, tools, or support to address the problem.
+  inclusion: Mentions of CHWs having insufficient supplies or capacity.
+  exclusion: Situations where resources were requested but not discussed as lacking.
+  examples:
+  - “I couldn't treat a child with fever because I had no medicine left and no way to refer the mother and child to a clinic.” → 0.9
+  - “I'm doing my best, but I feel stretched thin managing so many families.” → 0.4
+  - “I need more training.” → 0.1
+
+"Systemic Barriers":
+  definition: Issues outside CHW control, such as health facility shortages or corruption.
+  inclusion: Mentions of larger institutions or conditions preventing CHWs from helping.
+  exclusion: Personal limits or miscommunication unrelated to systemic forces.
+  examples:
+  - “I couldn’t get the patient admitted because the clinic was over crowded.” → 0.9
+  - “The hospital was too far away.” → 0.4
+  - “I couldn't help because I didn't understand what the person needed.” → 0.1
+
+"Overburdened CHWs":
+  definition: Too few CHWs available, too many patients, or excessive workloads.
+  inclusion: CHWs described as exhausted, overextended, or overwhelmed.
+  exclusion: Busy CHWs who were still able to deliver care successfully.
+  examples:
+  - “I feel burnt out from all the people I help in my community.” → 0.9
+  - “I was very busy this week, but I still managed to see all my clients.” → 0.4
+  - “I've seen multiple people in my community, and I haven't run into any difficulties.” → 0.1
+
+"Lack of Knowledge":
+  definition: Cases where a CHW was unable to address an issue because of a lack of knowledge.
+  inclusion: Mentions of CHWs unsure how to proceed or asking for additional training.
+  exclusion: Unable to address issues due to lack of knowledge, which were resolved through training.
+  examples:
+  - “I didn’t know how to treat the condition. I need more training.” → 0.9
+  - “I needed to ask a fellow CHW for help because I wasn't sure about the next treatment steps.” → 0.7
+  - “Before training, I didn't know how to administer first aid, but after training, I now know how to give first aid.” → 0.2
+  - “I ran out of medical supplies, but I knew what to do.” → 0.1

@@ -2,6 +2,7 @@ import os
 import re
 import json
 import hashlib
+import pandas as pd
 from docx import Document
 from typing import List, Dict
 from collections import OrderedDict
@@ -80,6 +81,21 @@ def save_as_jsonl(entries: List[Dict], out_path: str):
             json.dump(entry, f, ensure_ascii=False)
             f.write("\n")
 
+def save_as_excel(entries: List[Dict], out_path: str):
+    # Flatten content list into a single string for each entry
+    flattened = []
+    for entry in entries:
+        flattened.append({
+            "id": entry["id"],
+            "topic": entry.get("topic", ""),
+            "speaker": entry.get("speaker", ""),
+            "gender": entry.get("gender", ""),
+            "date": entry.get("date", ""),
+            "content": " ".join(entry.get("content", []))
+        })
+
+    df = pd.DataFrame(flattened)
+    df.to_excel(out_path, index=False)
 
 if __name__ == "__main__":
     input_folder = "data/validated"
@@ -109,3 +125,7 @@ if __name__ == "__main__":
 
     save_as_jsonl(all_entries, output_jsonl)
     print(f"\n✅ Extracted {len(all_entries)} total unique testimonials → {output_jsonl}")
+
+    output_excel = "data/processed/testimonials.xlsx"
+    save_as_excel(all_entries, output_excel)
+    print(f"📄 Excel version also saved → {output_excel}")

@@ -1,145 +1,120 @@
 import requests
 from models.base_model import BaseModel
-from typing import List, Dict
+from utils.model_safety_mixin import ModelSafetyMixin
+from typing import List, Dict, Tuple
 import re
 import json
+import time
 from utils.prompt_template import generate_prompt
 import nltk
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
-import re
+from math import ceil
 from ollama import Client
 
-class OllamaModel(BaseModel):
+class OllamaModel(BaseModel, ModelSafetyMixin):  # ✅ Inherit from ModelSafetyMixin
     def __init__(self, model_name="mistral", temperature: float = 0.0):
         self.api_url = "http://localhost:11434/api/generate"
         self.model_name = model_name
         self.temperature = temperature
-        self.client = Client()
 
-    def classify(self, text: str, labels: List[str], normalized_labels: Dict[str, str]) -> Dict:
-        prompt = generate_prompt(text, labels)
+    def classify(
+        self,
+        text: str,
+        labels: List[str],
+        normalized_labels: Dict[str, str],
+        concept_definitions: Dict[str, Dict] = None,
+        include_explanations: bool = False
+    ) -> Dict:
+        all_scores = {}
+        explanations = []
+        prompt_cache = {}
 
-        try:
-            response = requests.post(self.api_url, json={
-                "model": self.model_name,
-                "prompt": prompt,
-                "temperature": self.temperature,
-                "stream": False
-            })
+        for i, label in enumerate(labels):
+            print(f"\n📌 Scoring concept {i + 1}/{len(labels)} → {label}")
+            concept_label = [label]
 
-            raw_output = response.json().get("response", "")
+            prompt = generate_prompt(text, concept_label, concept_definitions or {})
 
-            print(f"\n[DEBUG] Raw Ollama output:\n{raw_output}\n")
+            if prompt in prompt_cache:
+                print("✅ Cache hit — skipping Ollama API call.")
+                raw_output = prompt_cache[prompt]
+            else:
+                response = requests.post(self.api_url, json={
+                    "model": self.model_name,
+                    "prompt": prompt,
+                    "temperature": self.temperature,
+                    "stream": False
+                })
+                raw_output = response.json().get("response", "")
 
-            json_str = self._extract_json(raw_output)
-            output_dict = json.loads(json_str)
+                # Fix common formatting issues
+                raw_output = re.sub(r'(\})(\s*\{)', r'\1,\2', raw_output)  # add comma between objects
+                raw_output = raw_output.strip("` \n")
+                raw_output = re.sub(r'//.*', '', raw_output)  # strip JS-style comments
 
-            # Handle nested vs flat JSON and normalize label keys
-            score_block = output_dict.get("labels", output_dict)  # fallback if not nested
-            explanation = output_dict.get("explanation", raw_output.replace(json_str, "").strip())
+                last_brace = raw_output.rfind('}')
+                if last_brace != -1:
+                    raw_output = raw_output[:last_brace + 1]
 
-            # Normalize keys in score_block and map them to config-defined labels
-            normalized_block = {}
-            for k, v in score_block.items():
-                norm_key = self._normalize_label(k)
-                for defined_label in labels:
-                    if self._normalize_label(defined_label) == norm_key:
-                        normalized_block[defined_label] = v
-                        break
+                prompt_cache[prompt] = raw_output
+                print("📤 Ollama API call made.")
+
+                reply = raw_output
+
+            print(f"\n[DEBUG] Raw Ollama output before parsing:\n{raw_output}\n")
+
+            try:
+                json_str = self._extract_json(raw_output)
+                output_dict = json.loads(json_str)
+
+                score_block = output_dict.get("labels")
+                if not isinstance(score_block, dict):
+                    print(f"⚠️ No valid 'labels' returned for concept '{label}' in model {self.model_name}")
+                    print(f"Raw GPT output (trimmed):\n{reply[:500]}...\n")
+                    raise ValueError("Expected 'labels' field to be a dictionary.")
+
+                # Conditionally extract explanation
+                if include_explanations:
+                    explanation = self._extract_explanation(output_dict, raw_output)
                 else:
-                    # Log unexpected keys if no match is found
-                    print(f"⚠️ Unexpected label from model: '{k}' → normalized as '{norm_key}'")
+                    explanation = ""
 
-            # DEBUG: Show how each label key was normalized
-            for k in score_block.keys():
-                print(f"Normalized '{k}' → '{self._normalize_label(k)}'")
+                normalized_block = {}
+                for k, v in score_block.items():
+                    norm_key = self._normalize_label(k)
+                    for defined_label in concept_label:
+                        if self._normalize_label(defined_label) == norm_key:
+                            normalized_block[defined_label] = v
+                            break
+                    else:
+                        print(f"⚠️ Unexpected label from Ollama: '{k}' → normalized as '{norm_key}'")
 
-            # Build parsed_scores using canonical label names
-            parsed_scores = {}
-            for norm_label, canonical_label in normalized_labels.items():
-                parsed_scores[canonical_label] = float(normalized_block.get(norm_label, 0.0))
-                
-            binned_scores = {
-                label: 1 if parsed_scores.get(label, 0.0) >= 0.5 else 0 for label in labels
-            }
+                for k in score_block:
+                    print(f"Normalized '{k}' → '{self._normalize_label(k)}'")
 
-            # Warn about unexpected label keys
-            for key in score_block:
-                normalized = self._normalize_label(key)
-                if normalized not in [self._normalize_label(label) for label in labels]:
-                    print(f"⚠️ Unexpected label from model: '{key}' → normalized as '{normalized}'")
+                parsed_scores = {
+                    label: float(normalized_block.get(label, 0.0))
+                    for label in concept_label
+                }
 
-            # Stem explanation and labels to catch morphological variants
-            stemmed_expl = self._stemmed_words(explanation)
-            stemmer = PorterStemmer()
+                all_scores.update(parsed_scores)
 
-            for norm_label, canonical_label in normalized_labels.items():
-                # Stem each word in the normalized label (e.g., "knowledge sharing" → ["knowledg", "share"])
-                label_stems = {stemmer.stem(word) for word in norm_label.split()}
+                if include_explanations:
+                    explanations.append(explanation)
+                    self._warn_on_low_scores(parsed_scores, explanation, normalized_labels)
 
-                # If all stemmed words are in the explanation, warn if score is low
-                if label_stems.issubset(stemmed_expl) and parsed_scores.get(canonical_label, 0.0) < 0.1:
-                    print(f"⚠️ Warning: '{canonical_label}' mentioned in explanation (stem match) but has very low score ({parsed_scores[canonical_label]})")
+            except Exception as e:
+                print("⚠️ Failed to parse response from Ollama model:", raw_output)
+                print("Error:", str(e))
+                explanations.append(f"Parsing failed for concept '{label}'")
 
-            return {
-                "labels": parsed_scores,
-                "binned_labels": binned_scores,
-                "explanation": explanation
-            }
+        binned_scores = {
+            label: 1 if all_scores.get(label, 0.0) >= 0.5 else 0 for label in labels
+        }
 
-        except Exception as e:
-            print("⚠️ Failed to parse response from Ollama model:", raw_output)
-            print("Error:", str(e))
-            return {
-                "labels": {label: 0.0 for label in labels},
-                "binned_labels": {label: 0 for label in labels},
-                "explanation": f"Parsing failed or API call failed: {str(e)}"
-            }
-
-    def _normalize_label(self, label: str) -> str:
-        """Standardize label for matching (lowercase, camelCase → spaced, dashes/underscores → space)."""
-        label = re.sub(r'([a-z])([A-Z])', r'\1 \2', label)  # split camelCase
-        label = label.replace("_", " ").replace("-", " ")
-        return label.strip().lower()
-    
-    def _stemmed_words(self, text: str) -> set:
-        stemmer = PorterStemmer()
-        tokens = word_tokenize(text.lower())
-        return {stemmer.stem(token) for token in tokens if token.isalpha()}
-
-    def _extract_json(self, text: str) -> str:
-        """
-        Extract the first JSON object from possibly noisy text output.
-        Removes comments and extracts clean JSON.
-        """
-        text = text.strip("` \n")
-
-        # Remove inline comments (e.g., // trust not mentioned)
-        text = re.sub(r'//.*', '', text)
-
-        # Try bracket slicing
-        start = text.find('{')
-        end = text.rfind('}') + 1
-        if start != -1 and end != -1 and end > start:
-            return text[start:end]
-
-        # Fallback regex
-        match = re.search(r'\{.*\}', text, re.DOTALL)
-        if match:
-            return match.group(0)
-
-        raise ValueError("No valid JSON object found in Ollama output.")
-    
-    def generate(self, prompt: str, system_prompt: str) -> str:
-        response = self.client.chat(
-            model=self.model_name,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt}
-            ],
-            options={
-                "temperature": self.temperature
-            }
-        )
-        return response["message"]["content"]
+        return {
+            "labels": all_scores,
+            "binned_labels": binned_scores,
+            "explanation": " | ".join(explanations) if include_explanations else ""
+        }
