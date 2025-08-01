@@ -8,7 +8,7 @@ import os
 
 load_dotenv()
 
-def load_models_from_config(config_path="config.yaml"):
+def load_models_from_config(config_path="config/config.yaml"):
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 
@@ -22,10 +22,10 @@ def load_models_from_config(config_path="config.yaml"):
         if name in ["mistral", "llama3", "qwen:7b", "mixtral"]:
             loaded_models[name] = OllamaModel(model_name=name, temperature=temperature)
 
-        elif name == "gpt":
+        elif name in ["gpt", "o3"]:
             api_key = os.getenv("OPENAI_API_KEY")
             print("Loaded GPT API Key:", api_key[:8], "...")  # confirm
-            loaded_models[name] = GPTModel(api_key=api_key, model="gpt-4", temperature=temperature)
+            loaded_models[name] = GPTModel(api_key=api_key, model=name)
 
         elif name == "claude":
             api_key = os.getenv("ANTHROPIC_API_KEY")

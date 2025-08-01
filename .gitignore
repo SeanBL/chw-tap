@@ -38,3 +38,5 @@ data/validated/
 
 # Ignore generated JSON ratings
 data/outputs/classification_ratings.json
+
+models/bertopic_model
