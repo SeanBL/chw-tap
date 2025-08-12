@@ -66,3 +66,13 @@ model_settings:
     temperature: 0.0
 
 include_explanations: true
+
+# for batch processing
+use_batch: false
+batch_providers: 
+  - openai
+  - anthropic
+
+provider_models:
+  openai: o3
+  anthropic: claude-3-opus-20240229

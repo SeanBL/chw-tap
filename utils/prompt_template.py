@@ -1,7 +1,7 @@
 from typing import List, Dict
 
 # prompt with explanation
-def generate_prompt(text: str, labels: List[str], concept_definitions: Dict[str, Dict[str, str]]) -> str:
+def generate_prompt(text: str, labels: List[str], concept_definitions: Dict[str, Dict[str, str]], include_explanations: bool = True) -> str:
     if len(labels) != 1:
       raise ValueError(f"Expected exactly one concept, but got {len(labels)}: {labels}")
 
@@ -21,6 +21,21 @@ def generate_prompt(text: str, labels: List[str], concept_definitions: Dict[str,
 
     if examples:
         label_block += f"\n  Examples:\n{examples}"
+
+    # Build the JSON-return instruction based on the toggle
+    if include_explanations:
+        return_json = f'''{{
+  "labels": {{
+    "{label}": score
+  }},
+  "explanation": "Brief justification for the score. Reference the concept definition or example where applicable."
+}}'''
+    else:
+        return_json = f'''{{
+  "labels": {{
+    "{label}": score
+  }}
+}}'''
 
     return f"""
 You are a researcher classifying community health worker (CHW) testimonials using predefined concepts.

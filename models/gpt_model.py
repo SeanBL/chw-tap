@@ -1,10 +1,8 @@
 import os
 import json
-import time
-import re
 from dotenv import load_dotenv
 from openai import OpenAI
-from typing import List, Dict
+from typing import List, Dict, Optional
 from math import ceil
 from models.base_model import BaseModel
 from utils.prompt_template import generate_prompt
@@ -13,11 +11,16 @@ from utils.model_safety_mixin import ModelSafetyMixin
 load_dotenv()
 
 class GPTModel(BaseModel, ModelSafetyMixin):
-    def __init__(self, api_key: str = None, model: str = "o3", temperature: float = None):
+    def __init__(self, api_key: str = None, model: str = "o3", temperature: float = None, organization: Optional[str] = None):
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+        self.org = organization or os.getenv("OPENAI_ORG_ID")  # <-- set in .env to your VERIFIED org id (e.g., org_abc123)
         self.model_name = model
         self.temperature = temperature
-        self.client = OpenAI(api_key=self.api_key)
+        self.client = OpenAI(api_key=self.api_key, organization=self.org)
+
+    def _is_o_series(self) -> bool:
+        name = (self.model_name or "").lower()
+        return name.startswith("o3") or name.startswith("o1")
 
     def classify(
         self,
@@ -47,22 +50,33 @@ class GPTModel(BaseModel, ModelSafetyMixin):
                     print("✅ Cache hit — skipping GPT API call.")
                     reply = prompt_cache[prompt]
                 else:
-                    kwargs = {
-                        "model": self.model_name,
-                        "messages": [
-                            {"role": "system", "content": "You are a helpful classifier."},
-                            {"role": "user", "content": prompt}
-                        ]
-                    }
-                    if self.model_name != "o3":
-                        kwargs["temperature"] = self.temperature or 0.0
+                    if self._is_o_series():  # <-- NEW
+                        # --- Responses API path for o-series (o3, o3-pro, etc.) ---
+                        response = self.client.responses.create(
+                            model=self.model_name,
+                            instructions="You are a helpful classifier.",  # system-equivalent
+                            input=prompt,
+                            reasoning={"effort": "medium"}  # optional
+                            # response_format={"type": "json_object"}  # uncomment if you want strict JSON
+                        )
+                        raw_output = getattr(response, "output_text", None)
+                        if not raw_output:
+                            raw_output = json.dumps(response.to_dict())
+                    else:
+                        # --- Chat Completions path for non-o models ---
+                        kwargs = {
+                            "model": self.model_name,
+                            "messages": [
+                                {"role": "system", "content": "You are a helpful classifier."},
+                                {"role": "user", "content": prompt}
+                            ],
+                            "temperature": self.temperature or 0.0
+                        }
+                        response = self.client.chat.completions.create(**kwargs)
+                        raw_output = response.choices[0].message.content.strip()
 
-                    response = self.client.chat.completions.create(**kwargs)
-                    print("OPENAI USAGE: ", response.usage)
-                    raw_output = response.choices[0].message.content.strip()
                     prompt_cache[prompt] = raw_output
-                    print("📤 GPT API call made.")
-
+                    print("📤 OpenAI call made.")
                     reply = raw_output
 
                 print(f"\n[DEBUG] GPT raw chunk:\n{reply[:500]}...\n")  # trimmed preview
@@ -77,7 +91,6 @@ class GPTModel(BaseModel, ModelSafetyMixin):
                         print(f"Raw GPT output (trimmed):\n{reply[:500]}...\n")
                         raise ValueError("Expected 'labels' field to be a dictionary.")
 
-                    # Skip explanation if disabled
                     if include_explanations:
                         explanation = self._extract_explanation(result, raw_output)
                     else:
@@ -128,20 +141,27 @@ class GPTModel(BaseModel, ModelSafetyMixin):
 
     def generate(self, prompt: str, system_prompt: str = "") -> str:
         try:
-            kwargs = {
-                "model": self.model_name,
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt}
-                ]
-            }
-            if self.model_name != "o3":
-                kwargs["temperature"] = self.temperature or 0.0
-
-            response = self.client.chat.completions.create(**kwargs)
-            return response.choices[0].message.content.strip()
+            if self._is_o_series():  # <-- NEW
+                r = self.client.responses.create(
+                    model=self.model_name,
+                    instructions=system_prompt,
+                    input=prompt,
+                    reasoning={"effort": "low"}
+                )
+                text = getattr(r, "output_text", None)
+                return text.strip() if isinstance(text, str) else json.dumps(r.to_dict())
+            else:
+                kwargs = {
+                    "model": self.model_name,
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": prompt}
+                    ],
+                    "temperature": self.temperature or 0.0
+                }
+                response = self.client.chat.completions.create(**kwargs)
+                return response.choices[0].message.content.strip()
 
         except Exception as e:
             print(f"[ERROR] GPT generate() failed: {e}")
             raise e
-
