@@ -1,35 +1,65 @@
 {
   "per_label": {
-    "CHW Empowered Through Training": {
-      "icc": 0.844,
-      "fleiss": 0.702,
-      "cohen": 0.702,
-      "krippendorff": 0.799,
-      "percent_agreement": 0.92
+    "Group Based Health Education": {
+      "icc": 0.824,
+      "fleiss": 0.745,
+      "cohen": 0.746,
+      "krippendorff": 0.774,
+      "percent_agreement": 0.88
     },
-    "Referrals and Advocacy": {
-      "icc": 0.882,
-      "fleiss": 0.351,
-      "cohen": 0.387,
-      "krippendorff": 0.83,
-      "percent_agreement": 0.68
+    "Individualized Support and Health Education": {
+      "icc": 0.897,
+      "fleiss": 0.758,
+      "cohen": 0.759,
+      "krippendorff": 0.865,
+      "percent_agreement": 0.88
     },
-    "Community Empowerment Through Education": {
-      "icc": 0.733,
-      "fleiss": 0.169,
-      "cohen": 0.194,
-      "krippendorff": 0.634,
-      "percent_agreement": 0.8
+    "Cholera Education and Prevention": {
+      "icc": -0.0,
+      "fleiss": NaN,
+      "cohen": NaN,
+      "krippendorff": 0.0,
+      "percent_agreement": 1.0,
+      "cohen_notes": "No variation in binary labels for models anthropic vs openai"
     },
-    "Handing out Medical Supplies ": {
-      "icc": 0.895,
+    "Direct Intervention for Cholera Cases": {
+      "icc": NaN,
+      "fleiss": NaN,
+      "cohen": NaN,
+      "krippendorff": NaN,
+      "percent_agreement": 1.0,
+      "cohen_notes": "No variation in binary labels for models anthropic vs openai"
+    },
+    "Diabetes Education and Prevention": {
+      "icc": 0.995,
       "fleiss": 1.0,
       "cohen": 1.0,
-      "krippendorff": 0.831,
+      "krippendorff": 0.993,
       "percent_agreement": 1.0
+    },
+    "HIV/AIDS Education and Prevention": {
+      "icc": 0.997,
+      "fleiss": 1.0,
+      "cohen": 1.0,
+      "krippendorff": 0.995,
+      "percent_agreement": 1.0
+    },
+    "Infectious Disease Prevention": {
+      "icc": 0.847,
+      "fleiss": 0.754,
+      "cohen": 0.754,
+      "krippendorff": 0.801,
+      "percent_agreement": 0.88
+    },
+    "Tuberculosis Education and Prevention": {
+      "icc": 0.938,
+      "fleiss": 0.645,
+      "cohen": 0.648,
+      "krippendorff": 0.917,
+      "percent_agreement": 0.96
     }
   },
   "overall": {
-    "krippendorff": 0.878
+    "krippendorff": 0.907
   }
 }

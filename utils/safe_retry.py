@@ -26,7 +26,7 @@ def safe_classify_with_retries(
         "gemini": 4,
         "claude": 3,
         # "gpt": 1,
-        "o3": 3
+        "o3": 4
     }
 
     if delay_overrides:
