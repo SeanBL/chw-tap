@@ -1,65 +1,287 @@
 {
   "per_label": {
+    "CHW Empowered Through Training": {
+      "icc": 0.927,
+      "fleiss": 0.841,
+      "cohen": 0.841,
+      "krippendorff": 0.904,
+      "percent_agreement": 0.965
+    },
+    "Menstrual Hygiene Education and Challenges": {
+      "icc": 0.989,
+      "fleiss": 0.941,
+      "cohen": 0.941,
+      "krippendorff": 0.986,
+      "percent_agreement": 0.993
+    },
+    "Drug Abuse: Environment and Awareness": {
+      "icc": 0.973,
+      "fleiss": 0.951,
+      "cohen": 0.951,
+      "krippendorff": 0.964,
+      "percent_agreement": 0.997
+    },
+    "CHW-Led Infectious Disease Management": {
+      "icc": 0.969,
+      "fleiss": 0.889,
+      "cohen": 0.889,
+      "krippendorff": 0.956,
+      "percent_agreement": 0.944
+    },
+    "Water Quality, Sanitation, and Hygiene": {
+      "icc": 0.974,
+      "fleiss": 0.889,
+      "cohen": 0.889,
+      "krippendorff": 0.965,
+      "percent_agreement": 0.965
+    },
+    "Personal Disease Management and Adherence": {
+      "icc": 0.869,
+      "fleiss": 0.663,
+      "cohen": 0.666,
+      "krippendorff": 0.821,
+      "percent_agreement": 0.833
+    },
+    "Nutrition Education and Food Access": {
+      "icc": 0.961,
+      "fleiss": 0.806,
+      "cohen": 0.807,
+      "krippendorff": 0.948,
+      "percent_agreement": 0.969
+    },
+    "Sexual and Reproductive Health Education": {
+      "icc": 0.98,
+      "fleiss": 0.895,
+      "cohen": 0.895,
+      "krippendorff": 0.972,
+      "percent_agreement": 0.962
+    },
+    "Gender-Based Violence (GBV) and Child Protection": {
+      "icc": 0.972,
+      "fleiss": 0.881,
+      "cohen": 0.881,
+      "krippendorff": 0.962,
+      "percent_agreement": 0.979
+    },
+    "Health Literacy and Misconceptions": {
+      "icc": 0.866,
+      "fleiss": 0.719,
+      "cohen": 0.719,
+      "krippendorff": 0.82,
+      "percent_agreement": 0.861
+    },
+    "Mental Health Awareness and Support": {
+      "icc": 0.944,
+      "fleiss": 0.797,
+      "cohen": 0.797,
+      "krippendorff": 0.925,
+      "percent_agreement": 0.944
+    },
+    "Referrals and Advocacy": {
+      "icc": 0.956,
+      "fleiss": 0.84,
+      "cohen": 0.841,
+      "krippendorff": 0.939,
+      "percent_agreement": 0.92
+    },
+    "Handing out Medical Supplies ": {
+      "icc": 0.864,
+      "fleiss": 0.707,
+      "cohen": 0.707,
+      "krippendorff": 0.812,
+      "percent_agreement": 0.976
+    },
+    "Monitoring and Follow-Up": {
+      "icc": 0.931,
+      "fleiss": 0.815,
+      "cohen": 0.816,
+      "krippendorff": 0.907,
+      "percent_agreement": 0.924
+    },
+    "Bridge Between Community and Health System": {
+      "icc": 0.826,
+      "fleiss": 0.655,
+      "cohen": 0.655,
+      "krippendorff": 0.777,
+      "percent_agreement": 0.889
+    },
+    "Clinical Interventions by CHWs": {
+      "icc": 0.837,
+      "fleiss": 0.787,
+      "cohen": 0.787,
+      "krippendorff": 0.786,
+      "percent_agreement": 0.976
+    },
+    "Mother and Infant Care": {
+      "icc": 0.93,
+      "fleiss": 0.78,
+      "cohen": 0.781,
+      "krippendorff": 0.905,
+      "percent_agreement": 0.948
+    },
+    "Direct Clinical Outcomes": {
+      "icc": 0.757,
+      "fleiss": 0.404,
+      "cohen": 0.408,
+      "krippendorff": 0.689,
+      "percent_agreement": 0.938
+    },
+    "Children Served": {
+      "icc": 0.975,
+      "fleiss": 0.897,
+      "cohen": 0.897,
+      "krippendorff": 0.967,
+      "percent_agreement": 0.951
+    },
+    "Elderly Served": {
+      "icc": 0.931,
+      "fleiss": 0.661,
+      "cohen": 0.661,
+      "krippendorff": 0.909,
+      "percent_agreement": 0.99
+    },
+    "Women Served": {
+      "icc": 0.974,
+      "fleiss": 0.882,
+      "cohen": 0.882,
+      "krippendorff": 0.966,
+      "percent_agreement": 0.941
+    },
+    "Men Served": {
+      "icc": 0.943,
+      "fleiss": 0.828,
+      "cohen": 0.828,
+      "krippendorff": 0.925,
+      "percent_agreement": 0.951
+    },
+    "Families Served": {
+      "icc": 0.95,
+      "fleiss": 0.83,
+      "cohen": 0.831,
+      "krippendorff": 0.933,
+      "percent_agreement": 0.927
+    },
+    "Marginalized Groups Served": {
+      "icc": 0.866,
+      "fleiss": 0.639,
+      "cohen": 0.647,
+      "krippendorff": 0.817,
+      "percent_agreement": 0.823
+    },
+    "Lack of Financial Resources for Healthcare": {
+      "icc": 0.946,
+      "fleiss": 0.885,
+      "cohen": 0.885,
+      "krippendorff": 0.928,
+      "percent_agreement": 0.979
+    },
+    "Social Isolation or Emotional Distress": {
+      "icc": 0.951,
+      "fleiss": 0.909,
+      "cohen": 0.909,
+      "krippendorff": 0.935,
+      "percent_agreement": 0.976
+    },
+    "Disease Burden": {
+      "icc": 0.89,
+      "fleiss": 0.746,
+      "cohen": 0.747,
+      "krippendorff": 0.856,
+      "percent_agreement": 0.875
+    },
+    "Stigma or Discrimination": {
+      "icc": 0.896,
+      "fleiss": 0.671,
+      "cohen": 0.671,
+      "krippendorff": 0.865,
+      "percent_agreement": 0.934
+    },
+    "Lack of Resources": {
+      "icc": 0.817,
+      "fleiss": 0.746,
+      "cohen": 0.747,
+      "krippendorff": 0.766,
+      "percent_agreement": 0.976
+    },
+    "Systemic Barriers": {
+      "icc": 0.822,
+      "fleiss": 0.715,
+      "cohen": 0.715,
+      "krippendorff": 0.758,
+      "percent_agreement": 0.934
+    },
+    "Overburdened CHWs": {
+      "icc": 0.743,
+      "fleiss": 0.665,
+      "cohen": 0.665,
+      "krippendorff": 0.672,
+      "percent_agreement": 0.997
+    },
+    "Lack of Knowledge": {
+      "icc": 0.53,
+      "fleiss": 0.389,
+      "cohen": 0.393,
+      "krippendorff": 0.441,
+      "percent_agreement": 0.979
+    },
     "Group Based Health Education": {
-      "icc": 0.824,
-      "fleiss": 0.745,
-      "cohen": 0.746,
-      "krippendorff": 0.774,
-      "percent_agreement": 0.88
+      "icc": 0.908,
+      "fleiss": 0.769,
+      "cohen": 0.77,
+      "krippendorff": 0.88,
+      "percent_agreement": 0.896
     },
     "Individualized Support and Health Education": {
-      "icc": 0.897,
-      "fleiss": 0.758,
-      "cohen": 0.759,
-      "krippendorff": 0.865,
-      "percent_agreement": 0.88
+      "icc": 0.931,
+      "fleiss": 0.799,
+      "cohen": 0.799,
+      "krippendorff": 0.908,
+      "percent_agreement": 0.899
     },
     "Cholera Education and Prevention": {
-      "icc": -0.0,
-      "fleiss": NaN,
-      "cohen": NaN,
-      "krippendorff": 0.0,
-      "percent_agreement": 1.0,
-      "cohen_notes": "No variation in binary labels for models anthropic vs openai"
+      "icc": 0.986,
+      "fleiss": 1.0,
+      "cohen": 1.0,
+      "krippendorff": 0.981,
+      "percent_agreement": 1.0
     },
     "Direct Intervention for Cholera Cases": {
-      "icc": NaN,
-      "fleiss": NaN,
-      "cohen": NaN,
-      "krippendorff": NaN,
-      "percent_agreement": 1.0,
-      "cohen_notes": "No variation in binary labels for models anthropic vs openai"
+      "icc": 0.921,
+      "fleiss": 0.566,
+      "cohen": 0.566,
+      "krippendorff": 0.896,
+      "percent_agreement": 0.99
     },
     "Diabetes Education and Prevention": {
-      "icc": 0.995,
-      "fleiss": 1.0,
-      "cohen": 1.0,
-      "krippendorff": 0.993,
-      "percent_agreement": 1.0
+      "icc": 0.842,
+      "fleiss": 0.855,
+      "cohen": 0.855,
+      "krippendorff": 0.795,
+      "percent_agreement": 0.997
     },
     "HIV/AIDS Education and Prevention": {
-      "icc": 0.997,
-      "fleiss": 1.0,
-      "cohen": 1.0,
-      "krippendorff": 0.995,
-      "percent_agreement": 1.0
+      "icc": 0.983,
+      "fleiss": 0.958,
+      "cohen": 0.958,
+      "krippendorff": 0.976,
+      "percent_agreement": 0.993
     },
     "Infectious Disease Prevention": {
-      "icc": 0.847,
-      "fleiss": 0.754,
-      "cohen": 0.754,
-      "krippendorff": 0.801,
-      "percent_agreement": 0.88
+      "icc": 0.899,
+      "fleiss": 0.768,
+      "cohen": 0.769,
+      "krippendorff": 0.865,
+      "percent_agreement": 0.892
     },
     "Tuberculosis Education and Prevention": {
-      "icc": 0.938,
-      "fleiss": 0.645,
-      "cohen": 0.648,
-      "krippendorff": 0.917,
-      "percent_agreement": 0.96
+      "icc": 0.966,
+      "fleiss": 0.852,
+      "cohen": 0.852,
+      "krippendorff": 0.955,
+      "percent_agreement": 0.99
     }
   },
   "overall": {
-    "krippendorff": 0.907
+    "krippendorff": 0.927
   }
 }

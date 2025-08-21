@@ -1,36 +1,36 @@
 labels:
-  # - "CHW Empowered Through Training"
-  # - "Menstrual Hygiene Education and Challenges"
-  # - "Drug Abuse: Environment and Awareness"
-  # - "CHW-Led Infectious Disease Management"
-  # - "Water Quality, Sanitation, and Hygiene"
-  # - "Personal Disease Management and Adherence"
-  # - "Nutrition Education and Food Access"
-  # - "Sexual and Reproductive Health Education"
-  # - "Gender-Based Violence (GBV) and Child Protection"
-  # - "Health Literacy and Misconceptions"
-  # - "Mental Health Awareness and Support"
-  # - "Referrals and Advocacy"
-  # - "Handing out Medical Supplies "
-  # - "Monitoring and Follow-Up"
-  # - "Bridge Between Community and Health System"
-  # - "Clinical Interventions by CHWs"
-  # - "Mother and Infant Care"
-  # - "Direct Clinical Outcomes"
-  # - "Children Served"
-  # - "Elderly Served"
-  # - "Women Served"
-  # - "Men Served"
-  # - "Families Served"
-  # - "Marginalized Groups Served"
-  # - "Lack of Financial Resources for Healthcare" 
-  # - "Social Isolation or Emotional Distress"
-  # - "Disease Burden"
-  # - "Stigma or Discrimination"
-  # - "Lack of Resources"
-  # - "Systemic Barriers"
-  # - "Overburdened CHWs"
-  # - "Lack of Knowledge"
+  - "CHW Empowered Through Training"
+  - "Menstrual Hygiene Education and Challenges"
+  - "Drug Abuse: Environment and Awareness"
+  - "CHW-Led Infectious Disease Management"
+  - "Water Quality, Sanitation, and Hygiene"
+  - "Personal Disease Management and Adherence"
+  - "Nutrition Education and Food Access"
+  - "Sexual and Reproductive Health Education"
+  - "Gender-Based Violence (GBV) and Child Protection"
+  - "Health Literacy and Misconceptions"
+  - "Mental Health Awareness and Support"
+  - "Referrals and Advocacy"
+  - "Handing out Medical Supplies "
+  - "Monitoring and Follow-Up"
+  - "Bridge Between Community and Health System"
+  - "Clinical Interventions by CHWs"
+  - "Mother and Infant Care"
+  - "Direct Clinical Outcomes"
+  - "Children Served"
+  - "Elderly Served"
+  - "Women Served"
+  - "Men Served"
+  - "Families Served"
+  - "Marginalized Groups Served"
+  - "Lack of Financial Resources for Healthcare" 
+  - "Social Isolation or Emotional Distress"
+  - "Disease Burden"
+  - "Stigma or Discrimination"
+  - "Lack of Resources"
+  - "Systemic Barriers"
+  - "Overburdened CHWs"
+  - "Lack of Knowledge"
   - "Group Based Health Education"
   - "Individualized Support and Health Education"
   - "Cholera Education and Prevention"
@@ -68,11 +68,14 @@ model_settings:
 include_explanations: true
 
 # for batch processing
-use_batch: false
+use_batch: true
+batch_size: 25
+batch_mode: chunked 
 batch_providers: 
   - openai
   - anthropic
+strict_coverage: true
 
 provider_models:
-  openai: o3
-  anthropic: claude-3-opus-20240229
+  openai: o3-2025-04-16 
+  anthropic: claude-opus-4-20250514

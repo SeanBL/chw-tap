@@ -1,6 +1,7 @@
 import os
 import json
 import yaml
+import glob
 import pandas as pd
 from datetime import datetime
 from utils.config import load_config
@@ -100,7 +101,7 @@ def run_batch_analysis_both(openai_results_path: str,
             print(f"OpenAI labels for {tid}:", sorted(openai_data[tid]["labels"].keys())[:5], "…", len(openai_data[tid]["labels"]))
             print(f"Anthropic labels for {tid}:", sorted(anthropic_data[tid]["labels"].keys())[:5], "…", len(anthropic_data[tid]["labels"]))
         else:
-            print("⚠️ No overlapping testimonial IDs between OpenAI and Anthropic.")
+            print( "⚠️ No overlapping testimonial IDs between OpenAI and Anthropic.")
             return
 
     ratings, results, explanations_log = merge_all_results(
@@ -173,6 +174,105 @@ def run_batch_analysis_both(openai_results_path: str,
             explanations_df.to_excel(writer, sheet_name="Explanations", index=False, float_format="%.3f")
 
     print(f"📉 Disagreement log saved to {disagreement_output_path}")
+
+def run_final_merged_analysis(batch_cache_dir: str = "data/batch/cached_results",
+                              output_dir: str = "data/outputs"):
+    """
+    Aggregate ALL cached chunk results for both providers and run the same
+    exports + IRR workflow you use in run_batch_analysis_both(...).
+    """
+    config = load_config()
+    labels = config["labels"]
+
+    pm = config.get("provider_models", {})
+    model_display_map = {"openai": pm.get("openai", "openai"),
+                         "anthropic": pm.get("anthropic", "anthropic")}
+    include_explanations = config.get("include_explanations", True)
+
+    testimonial_path = "data/processed/testimonials.jsonl"
+    os.makedirs(output_dir, exist_ok=True)
+
+    testimonials = load_testimonials_from_jsonl(testimonial_path)
+    testimonial_map = {str(t.get("id", i)): t for i, t in enumerate(testimonials)}
+
+    # 1) Find all cached results written by download_results(...)
+    o_paths = sorted(glob.glob(os.path.join(batch_cache_dir, "openai_*.jsonl")))
+    a_paths = sorted(glob.glob(os.path.join(batch_cache_dir, "anthropic_*_results.jsonl")))
+    if not o_paths or not a_paths:
+        raise RuntimeError("No cached results found for one or both providers.")
+
+    # 2) Aggregate across many files (per provider) using your existing loaders
+    def _accumulate(agg: dict, part: dict):
+        for tid, payload in part.items():
+            d = agg.setdefault(tid, {"labels": {}, "explanations": {}})
+            for k, v in (payload.get("labels") or {}).items():
+                # prefer non-None; don't overwrite a real number with None
+                if d["labels"].get(k) is None and v is not None:
+                    d["labels"][k] = v
+                elif k not in d["labels"]:
+                    d["labels"][k] = v
+            for k, exp in (payload.get("explanations") or {}).items():
+                d["explanations"].setdefault(k, exp)
+
+    agg_openai, agg_anthropic = {}, {}
+    for p in o_paths:
+        _accumulate(agg_openai, load_openai_results(p))
+    for p in a_paths:
+        _accumulate(agg_anthropic, load_anthropic_results(p))
+
+    # 3) Merge both providers using your existing merge_all_results
+    ratings, results, explanations_log = merge_all_results(
+        agg_openai,
+        agg_anthropic,
+        testimonial_map,
+        labels,
+        include_explanations=include_explanations,
+        model_display_map=model_display_map,
+    )
+
+    # 4) Persist + reuse your existing export/IRR flow (same as run_batch_analysis_both)
+    with open(f"{output_dir}/classification_ratings.json", "w", encoding="utf-8") as f:
+        json.dump(ratings, f, indent=2)
+
+    pretty_model_names = [model_display_map[m] for m in ["openai", "anthropic"]]
+    export_full_excel_report(
+        results, labels, pretty_model_names, output_dir,
+        include_explanations=include_explanations
+    )
+
+    provider_model_names = ["openai", "anthropic"]
+    concept_frequencies = aggregate_concept_frequencies(ratings, provider_model_names)
+    consensus_labels = compute_consensus_labels(ratings, method="vote", model_names=provider_model_names)
+    concept_output_path = f"{output_dir}/concept_frequency_consensus.xlsx"
+    with pd.ExcelWriter(concept_output_path, engine="openpyxl") as writer:
+        pd.DataFrame(concept_frequencies).to_excel(writer, sheet_name="Concept Frequencies", index=False)
+        pd.DataFrame(consensus_labels).to_excel(writer, sheet_name="Consensus Labels", index=False)
+
+    irr_scores = compute_irr_scores(ratings)
+    with open(f"{output_dir}/irr_scores.json", "w", encoding="utf-8") as f:
+        json.dump(irr_scores, f, indent=2)
+    visualize_irr_scores(irr_scores)
+    print_irr_table(irr_scores)
+    export_irr_to_excel(irr_scores)
+
+    disagreement_records = compute_model_disagreements(ratings)
+    disagreement_df = pd.DataFrame(disagreement_records)
+    disagreement_summary = summarize_disagreements(disagreement_df)
+    flagged_testimonials = flag_high_disagreement_testimonials(disagreement_df, provider_model_names)
+    model_disagreement_summary = model_disagreement_percentages(disagreement_df)
+    explanations_df = pd.DataFrame(explanations_log)
+
+    disagreement_output_path = f"{output_dir}/model_disagreements.xlsx"
+    with pd.ExcelWriter(disagreement_output_path, engine="openpyxl") as writer:
+        disagreement_df.to_excel(writer, sheet_name="Disagreements", index=False, float_format="%.3f")
+        disagreement_summary.to_excel(writer, sheet_name="Summary", index=False, float_format="%.3f")
+        model_disagreement_summary.to_excel(writer, sheet_name="Model Summary", index=False, float_format="%.3f")
+        if not flagged_testimonials.empty:
+            flagged_testimonials.to_excel(writer, sheet_name="Flagged", index=False, float_format="%.3f")
+        if include_explanations and not explanations_df.empty:
+            explanations_df.to_excel(writer, sheet_name="Explanations", index=False, float_format="%.3f")
+
+    print("✅ Full merged analysis complete.")
 
 if __name__ == "__main__":
     # Temporary manual test

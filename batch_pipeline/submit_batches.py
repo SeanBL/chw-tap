@@ -48,35 +48,35 @@ def _preview_first_lines(path, n=3):
         lines = [f"<preview failed: {e}>"]
     return lines
 
-def submit_openai_batch():
+def submit_openai_batch(input_path: str | None = None, completion_window: str = "24h") -> str:
     log_to_file(LOG_PATH, f"🔵 [OpenAI] Preparing to submit batch job...")
-    if not os.path.exists(OPENAI_INPUT_PATH):
-        msg = f"❌ [OpenAI] Input file not found: {OPENAI_INPUT_PATH}"
+    jsonl_path = input_path or OPENAI_INPUT_PATH   # <— NEW
+    if not os.path.exists(jsonl_path):
+        msg = f"❌ [OpenAI] Input file not found: {jsonl_path}"
         log_to_file(LOG_PATH, msg)
         raise FileNotFoundError(msg)
 
     # Preview input
-    preview = _preview_first_lines(OPENAI_INPUT_PATH, n=3)
-    log_to_file(LOG_PATH, f"🔵 [OpenAI] Input path: {OPENAI_INPUT_PATH}")
+    preview = _preview_first_lines(jsonl_path, n=3)
+    log_to_file(LOG_PATH, f"🔵 [OpenAI] Input path: {jsonl_path}")
     log_to_file(LOG_PATH, "🔵 [OpenAI] First 3 lines of input:")
     for i, line in enumerate(preview, 1):
         log_to_file(LOG_PATH, f"   {i:02d}: {line}")
 
-    # Upload the JSONL file to OpenAI Files API
+    # Upload the JSONL file
     log_to_file(LOG_PATH, "🔵 [OpenAI] Uploading file to /v1/files ...")
     try:
-        with open(OPENAI_INPUT_PATH, "rb") as f:
+        with open(jsonl_path, "rb") as f:
             upload_response = requests.post(
                 "https://api.openai.com/v1/files",
                 headers={"Authorization": f"Bearer {OPENAI_API_KEY}"},
-                files={"file": (Path(OPENAI_INPUT_PATH).name, f)},
+                files={"file": (Path(jsonl_path).name, f)},
                 data={"purpose": "batch"}
             )
         upload_data = upload_response.json()
     except Exception as e:
         log_to_file(LOG_PATH, f"❌ [OpenAI] Upload request error: {repr(e)}")
         raise
-
     if upload_response.status_code != 200:
         log_to_file(LOG_PATH, f"❌ [OpenAI] Upload failed: {upload_data}")
         raise RuntimeError(f"Failed to upload OpenAI file: {upload_data}")
@@ -85,30 +85,21 @@ def submit_openai_batch():
     log_to_file(LOG_PATH, f"✅ [OpenAI] File uploaded. File ID: {file_id}")
 
     # Detect endpoint from the JSONL (supports both chat + responses)
-    endpoint = _infer_openai_endpoint(OPENAI_INPUT_PATH)
+    endpoint = _infer_openai_endpoint(jsonl_path)   # <— use the actual path
     log_to_file(LOG_PATH, f"🔵 [OpenAI] Using endpoint: {endpoint}")
 
-    # Submit the batch job
-    payload = {
-        "input_file_id": file_id,
-        "endpoint": endpoint,
-        "completion_window": "24h"
-    }
+    payload = {"input_file_id": file_id, "endpoint": endpoint, "completion_window": completion_window}
     log_to_file(LOG_PATH, "🔵 [OpenAI] Submitting batch to /v1/batches ...")
     try:
         submit_response = requests.post(
             "https://api.openai.com/v1/batches",
-            headers={
-                "Authorization": f"Bearer {OPENAI_API_KEY}",
-                "Content-Type": "application/json"
-            },
+            headers={"Authorization": f"Bearer {OPENAI_API_KEY}", "Content-Type": "application/json"},
             data=json.dumps(payload)
         )
         batch_data = submit_response.json()
     except Exception as e:
         log_to_file(LOG_PATH, f"❌ [OpenAI] Submit request error: {repr(e)}")
         raise
-
     if submit_response.status_code != 200:
         log_to_file(LOG_PATH, f"❌ [OpenAI] Submit failed: {batch_data}")
         raise RuntimeError(f"Failed to submit OpenAI batch: {batch_data}")
@@ -120,30 +111,28 @@ def submit_openai_batch():
 
 
 # === Submit to Anthropic ===
-def submit_anthropic_batch():
+def submit_anthropic_batch(input_path: str | None = None) -> str:
     log_to_file(LOG_PATH, "🟠 [Anthropic] Preparing to submit batch job...")
-    if not os.path.exists(ANTHROPIC_INPUT_PATH):
-        msg = f"❌ [Anthropic] Input file not found: {ANTHROPIC_INPUT_PATH}"
+    json_path = input_path or ANTHROPIC_INPUT_PATH   # <— NEW
+    if not os.path.exists(json_path):
+        msg = f"❌ [Anthropic] Input file not found: {json_path}"
         log_to_file(LOG_PATH, msg)
         raise FileNotFoundError(msg)
 
-    # Preview input
-    preview = _preview_first_lines(ANTHROPIC_INPUT_PATH, n=3)
-    log_to_file(LOG_PATH, f"🟠 [Anthropic] Input path: {ANTHROPIC_INPUT_PATH}")
+    preview = _preview_first_lines(json_path, n=3)
+    log_to_file(LOG_PATH, f"🟠 [Anthropic] Input path: {json_path}")
     log_to_file(LOG_PATH, "🟠 [Anthropic] First 3 lines of input:")
     for i, line in enumerate(preview, 1):
         log_to_file(LOG_PATH, f"   {i:02d}: {line}")
 
-    # Load payload
     try:
-        with open(ANTHROPIC_INPUT_PATH, "r", encoding="utf-8") as f:
+        with open(json_path, "r", encoding="utf-8") as f:
             payload = json.load(f)
     except Exception as e:
         log_to_file(LOG_PATH, f"❌ [Anthropic] Failed reading JSON: {repr(e)}")
         raise
 
-    # Submit
-    log_to_file(LOG_PATH, "🟠 [Anthropic] Submitting to /v1/message_batches ...")
+    log_to_file(LOG_PATH, "🟠 [Anthropic] Submitting to /v1/messages/batches ...")
     try:
         response = requests.post(
             "https://api.anthropic.com/v1/messages/batches",
@@ -158,7 +147,6 @@ def submit_anthropic_batch():
     except Exception as e:
         log_to_file(LOG_PATH, f"❌ [Anthropic] Submit request error: {repr(e)}")
         raise
-
     if response.status_code != 200:
         log_to_file(LOG_PATH, f"❌ [Anthropic] Submit failed: {data}")
         raise RuntimeError(f"Failed to submit Anthropic batch: {data}")
