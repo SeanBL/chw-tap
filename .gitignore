@@ -40,3 +40,43 @@ data/validated/
 data/outputs/classification_ratings.json
 
 models/bertopic_model
+
+# Batch pipeline cache & inputs
+data/batch/cached_results/
+data/batch/inputs/
+data/batch/openai_batch_input.jsonl
+data/batch/anthropic_batch_input.json
+
+# Generated outputs
+data/outputs/*.xlsx
+data/outputs/*.jsonl
+
+# Logs
+logs/*.txt
+
+# Analysis scratch dirs
+data_analysis/
+reliability_out/
+
+# -------------------------
+# reliability (contains code + results)
+#   Keep .py; ignore generated artifacts
+# -------------------------
+reliability/__pycache__/
+reliability/*.xlsx
+reliability/*.csv
+reliability/*.json
+reliability/*.html
+reliability/*.png
+reliability/*.jpg
+reliability/*.svg
+reliability/~$*
+!reliability/*.py
+!reliability/README*
+
+outputs/**
+
+# -------------------------
+# Logs
+# -------------------------
+logs/

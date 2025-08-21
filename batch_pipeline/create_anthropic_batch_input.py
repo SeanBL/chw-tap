@@ -3,6 +3,7 @@ import yaml
 import re
 from pathlib import Path
 from datetime import datetime
+from typing import Optional, Set
 from utils.prompt_template import generate_prompt
 from utils.config import load_config
 
@@ -15,9 +16,12 @@ def _slug_for_anthropic(label: str) -> str:
     return s or "label"
 
 def _sanitize_id(value: str) -> str:
-    # Anthropic custom_id must match ^[a-zA-Z0-9_-]{1,64}$
+    """
+    Anthropic custom_id must match ^[a-zA-Z0-9_-]{1,64}$.
+    Keep the base short so there's room for the label tail.
+    """
     v = _ID_SAFE_RE.sub('_', str(value)).strip('_-')
-    return v[:32] or "id"  # keep base short to leave room for label tail
+    return v[:32] or "id"
 
 def load_testimonials_from_jsonl(path: str, limit: int = None) -> list:
     testimonials = []
@@ -45,14 +49,28 @@ def create_anthropic_batch_file(
     model_name: str = "claude-opus-4-20250514",
     batch_id: str = None,
     max_tokens: int = 1024,
-    temperature: float = None,   # optional; omit if None
+    temperature: Optional[float] = None,   # optional; omit if None
     limit: int = None,
+    ids_filter: Optional[Set[str]] = None, # <-- NEW: only include these IDs if provided
 ):
-    # read toggle from config so prompts match your REST runs
+    """
+    Writes a single Anthropic batch JSON with:
+      {
+        "requests": [
+          {"custom_id": "<id>_<label_slug>", "params": {...}},
+          ...
+        ]
+      }
+    One request per (testimonial × label). Use `ids_filter` to emit chunked subsets.
+    """
+    # read toggle from config so prompts match your analysis run
     cfg = load_config()
     include_explanations = cfg.get("include_explanations", True)
 
     labels, concept_definitions = load_labels_and_concepts()
+    # deterministic label order helps with reproducibility
+    labels = list(labels)
+
     testimonials = load_testimonials_from_jsonl(testimonial_path, limit)
 
     if not batch_id:
@@ -61,7 +79,12 @@ def create_anthropic_batch_file(
 
     requests = []
     for i, entry in enumerate(testimonials):
-        base_id = _sanitize_id(entry.get("id", i + 1))
+        # Keep a numeric-leading base id so your loader's regex picks it up
+        tid = str(entry.get("id", i + 1))
+        if ids_filter and tid not in ids_filter:
+            continue
+
+        base_id = _sanitize_id(tid)  # still starts with the numeric tid in your data
         text = entry["text"]
 
         # ONE request per (testimonial × label) with a single-label prompt
@@ -78,14 +101,14 @@ def create_anthropic_batch_file(
 
             # Enforce 64-char max custom_id
             if len(safe_id) > 64:
-                tail_len = 64 - len(base_id) - 1
-                safe_id = f"{base_id}_{slug[-max(tail_len, 1):]}"
+                tail_len = max(1, 64 - len(base_id) - 1)
+                safe_id = f"{base_id}_{slug[-tail_len:]}"
 
-            # Ensure first char is alnum
+            # Ensure first char is alnum (spec requirement)
             if not re.match(r"[A-Za-z0-9]", safe_id):
                 safe_id = f"x{safe_id}"
+                safe_id = safe_id[:64]
 
-            # Anthropic batch requires params field
             params = {
                 "model": model_name,
                 "messages": [{"role": "user", "content": prompt}],
@@ -103,17 +126,19 @@ def create_anthropic_batch_file(
 
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(batch_payload, f, indent=2)
+        json.dump(batch_payload, f, ensure_ascii=False, indent=2)
 
     print(f"✅ Anthropic batch input file saved to: {output_path}")
-    print(f"📦 Batch ID: {batch_id}")
+    print(f"📦 Batch ID (local tag): {batch_id}  |  Requests: {len(requests)}")
     return batch_id
 
 if __name__ == "__main__":
+    # Full file (no chunking) example:
     create_anthropic_batch_file(
         testimonial_path="data/processed/testimonials.jsonl",
         output_path="data/batch/inputs/anthropic_batch_input.json",
         model_name="claude-opus-4-20250514",
-        limit=None
+        limit=None,
+        ids_filter=None,  # or set: ids_filter={"1","2",...} for a chunk
     )
 

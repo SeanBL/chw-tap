@@ -3,18 +3,142 @@ import json
 import time
 import requests
 from datetime import datetime
+import glob
+from pathlib import Path
 from utils.config import load_config
 from utils.logging import log_to_file
 from utils.retry import retry_with_backoff
+from batch_pipeline.create_openai_batch_input import (
+    create_batch_input_file as build_openai_input,
+    load_testimonials_from_jsonl,
+)
+from batch_pipeline.create_anthropic_batch_input import (
+    create_anthropic_batch_file as build_anthropic_input
+)
 from batch_pipeline.submit_batches import submit_openai_batch, submit_anthropic_batch
 from batch_pipeline.poll_batches import poll_openai_batch, poll_anthropic_batch
 from batch_pipeline.download_results import download_results
-from batch_pipeline.run_batch_analysis import run_batch_analysis_both
+from batch_pipeline.run_batch_analysis import run_batch_analysis_both, run_final_merged_analysis
+from batch_pipeline.merge_results import load_openai_results, load_anthropic_results
+
+
+
 
 # Constants
 LOG_PATH = "logs/batch_log.txt"
 CACHE_DIR = "data/batch/cached_results"
 
+def _chunk(lst, n):
+    for i in range(0, len(lst), n):
+        yield lst[i:i+n]
+
+def _load_all_ids(testimonial_path="data/processed/testimonials.jsonl"):
+    items = load_testimonials_from_jsonl(testimonial_path)
+    return [str(t.get("id", i + 1)) for i, t in enumerate(items)]
+
+def _norm_label(s: str) -> str:
+    return str(s).lower().strip().replace("-", " ").replace("_", " ")
+
+def _coverage_report(cache_dir, expected_ids, labels):
+    # discover cached files
+    o_paths = sorted(glob.glob(os.path.join(cache_dir, "openai_*.jsonl")))
+    a_paths = sorted(glob.glob(os.path.join(cache_dir, "anthropic_*_results.jsonl")))
+
+    # aggregate quickly (re-using your loaders)
+    agg_o, agg_a = {}, {}
+    def _accumulate(agg, part):
+        for tid, payload in part.items():
+            d = agg.setdefault(tid, {"labels": {}, "explanations": {}})
+            for k, v in (payload.get("labels") or {}).items():
+                if d["labels"].get(k) is None and v is not None:
+                    d["labels"][k] = v
+
+    for p in o_paths:
+        _accumulate(agg_o, load_openai_results(p))
+    for p in a_paths:
+        _accumulate(agg_a, load_anthropic_results(p))
+
+    # compute coverage
+    exp_pairs = {(tid, lbl) for tid in expected_ids for lbl in labels}
+    canon = { _norm_label(lbl): lbl for lbl in labels }
+
+    def _pairs_from(agg):
+        have = set()
+        for tid, payload in agg.items():
+            for k, v in (payload.get("labels") or {}).items():
+                if v is None: 
+                    continue
+                lbl = canon.get(_norm_label(k))
+                if lbl:
+                    have.add((tid, lbl))
+        return have
+
+    have_o = _pairs_from(agg_o)
+    have_a = _pairs_from(agg_a)
+    total = len(exp_pairs)
+    done_o = len(have_o)
+    done_a = len(have_a)
+
+    print(f"[Coverage] OpenAI: {done_o}/{total} ({done_o/total:.1%}) | Anthropic: {done_a}/{total} ({done_a/total:.1%})")
+    return (done_o == total) and (done_a == total)
+
+def run_chunked_job(batch_size=25):
+    config = load_config()
+    labels = config["labels"]
+    pm = config.get("provider_models", {})  # adjust keys if your config differs
+    openai_model    = pm.get("openai", "o3")
+    anthropic_model = pm.get("anthropic", "claude-opus-4-20250514")
+    testimonial_path = "data/processed/testimonials.jsonl"
+
+    ids = _load_all_ids(testimonial_path)
+    os.makedirs("data/batch/inputs", exist_ok=True)
+    os.makedirs(CACHE_DIR, exist_ok=True)
+
+    for idx, id_chunk in enumerate(_chunk(ids, batch_size), start=1):
+        ids_filter = set(id_chunk)
+
+        # 1) Build per-chunk input files (both providers)
+        oai_in = f"data/batch/inputs/openai_chunk_{idx:03}.jsonl"
+        ant_in = f"data/batch/inputs/anthropic_chunk_{idx:03}.json"
+
+        build_openai_input(
+            testimonial_path=testimonial_path,
+            output_path=oai_in,
+            model_name=openai_model,
+            ids_filter=ids_filter
+        )
+        build_anthropic_input(
+            testimonial_path=testimonial_path,
+            output_path=ant_in,
+            model_name=anthropic_model,
+            ids_filter=ids_filter
+        )
+
+        # 2) Submit both using the per-chunk paths
+        log_to_file(LOG_PATH, f"📤 Submitting chunk {idx} (size={len(id_chunk)})")
+        o_job = submit_openai_batch(input_path=oai_in)
+        a_job = submit_anthropic_batch(input_path=ant_in)
+
+        # 3) Poll and download both
+        for provider, job in (("openai", o_job), ("anthropic", a_job)):
+            if poll_until_complete(provider, job):
+                path = download_results(provider, job, CACHE_DIR)
+                log_to_file(LOG_PATH, f"✅ {provider} results saved to: {path}")
+            else:
+                log_to_file(LOG_PATH, f"⚠️ Skipping download for failed {provider} job {job}")
+
+        # 4) Optional: show dynamic coverage after each chunk
+        _coverage_report(CACHE_DIR, expected_ids=ids, labels=labels)
+
+    # 5) After all chunks: only run final analysis if coverage is complete
+    complete = _coverage_report(CACHE_DIR, expected_ids=ids, labels=labels)
+    if not complete:
+        log_to_file(LOG_PATH, "⏸️ Coverage incomplete; skipping final IRR/exports for now.")
+        return
+    log_to_file(LOG_PATH, "📊 Running final merged analysis across all cached chunks")
+    run_final_merged_analysis(batch_cache_dir=CACHE_DIR, output_dir="data/outputs")
+
+# Single batch job submission
 
 def submit_batch_job(provider):
     log_to_file(LOG_PATH, f"Submitting batch job to {provider}...")
@@ -127,4 +251,8 @@ def run_batch_job():
 if __name__ == "__main__":
     os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
     os.makedirs(CACHE_DIR, exist_ok=True)
-    run_batch_job()
+    USE_CHUNKED = True   # set False to use single-shot flow
+    if USE_CHUNKED:
+        run_chunked_job(batch_size=25)
+    else:
+        run_batch_job()
